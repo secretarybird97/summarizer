@@ -13,8 +13,7 @@ RUN --mount=type=cache,target=/root/.m2 ./mvnw install -DskipTests
 
 FROM builder AS extractor
 
-ARG JAR_FILE=target/*.jar
-COPY ${JAR_FILE} target/application.jar
+RUN JAR_FILE=$(ls target/*.jar) && cp ${JAR_FILE} target/application.jar
 RUN java -Djarmode=layertools -jar target/application.jar extract --destination target/extracted
 
 # Production image

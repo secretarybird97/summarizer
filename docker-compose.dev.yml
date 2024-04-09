@@ -1,6 +1,19 @@
 version: "3.8"
 
 services:
+  db:
+    container_name: postgres
+    image: postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: postgres
+    networks:
+      - summarizer
+    volumes:
+      - ./db:/var/lib/postgresql/data
+
   server:
     container_name: spring-boot
     restart: always
@@ -18,27 +31,25 @@ services:
       - .env.example
     volumes:
       - ./server/src:/app/server/src
+    depends_on:
+      - db
     ports:
-      - 8080:8080
+      - 3000:3000
     networks:
       - summarizer
 
-  db:
-    container_name: postgres
-    image: postgres
+  client:
+    container_name: angular
     restart: always
+    build:
+      context: ./client
+      dockerfile: dev.Dockerfile
+    volumes:
+      - ./client/src:/app/client/src
     ports:
-      - "5432:5432"
-    environment:
-      POSTGRES_PASSWORD: postgres
+      - 4200:4200
     networks:
       - summarizer
-    volumes:
-      - ./db:/var/lib/postgresql/data
 
-  # Add more containers below (nginx, postgres, etc.)
-
-# Define a network, which allows containers to communicate
-# with each other, by using their container name as a hostname
 networks:
   summarizer:

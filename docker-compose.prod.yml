@@ -1,0 +1,53 @@
+version: "3.8"
+
+services:
+  db:
+    container_name: postgres
+    image: postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: postgres
+    networks:
+      - summarizer
+    volumes:
+      - ./db:/var/lib/postgresql/data
+
+  server:
+    container_name: spring-boot
+    restart: always
+    build:
+      context: ./server
+      dockerfile: prod.Dockerfile
+
+    # Set environment variables directly in the docker-compose file
+    # environment:
+    #  ENV_VARIABLE: ${ENV_VARIABLE}
+    #  NEXT_PUBLIC_ENV_VARIABLE: ${NEXT_PUBLIC_ENV_VARIABLE}
+
+    # Set environment variables based on the .env file
+    env_file:
+      - .env.example
+    depends_on:
+      - db
+    ports:
+      - 3000:3000
+    networks:
+      - summarizer
+
+  client:
+    container_name: nginx
+    restart: unless-stopped
+    build:
+      context: ./client
+      dockerfile: prod.Dockerfile
+    ports:
+      - 80:80
+    networks:
+      - summarizer
+    depends_on:
+      - server
+
+networks:
+  summarizer:

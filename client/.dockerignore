@@ -3,4 +3,4 @@ node_modules/
 .vscode
 .editorconfig
 .gitignore
-README.md
+*.md
