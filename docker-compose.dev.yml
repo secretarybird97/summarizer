@@ -14,11 +14,11 @@ services:
     volumes:
       - ./db:/var/lib/postgresql/data
 
-  server:
+  backend:
     container_name: spring-boot
     restart: always
     build:
-      context: ./server
+      context: ./backend
       dockerfile: dev.Dockerfile
 
     # Set environment variables directly in the docker-compose file
@@ -30,7 +30,7 @@ services:
     env_file:
       - .env.example
     volumes:
-      - ./server/src:/app/server/src
+      - ./backend/src:/app/src
     depends_on:
       - db
     ports:
@@ -42,10 +42,10 @@ services:
     container_name: angular
     restart: always
     build:
-      context: ./client
+      context: ./frontend
       dockerfile: dev.Dockerfile
     volumes:
-      - ./client/src:/app/client/src
+      - ./frontend/src:/app/src
     ports:
       - 4200:4200
     networks:

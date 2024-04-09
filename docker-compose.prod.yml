@@ -18,7 +18,7 @@ services:
     container_name: spring-boot
     restart: always
     build:
-      context: ./server
+      context: ./backend
       dockerfile: prod.Dockerfile
 
     # Set environment variables directly in the docker-compose file
@@ -36,14 +36,14 @@ services:
     networks:
       - summarizer
 
-  client:
-    container_name: nginx
+  frontend:
+    container_name: angular
     restart: unless-stopped
     build:
-      context: ./client
+      context: ./frontend
       dockerfile: prod.Dockerfile
     ports:
-      - 80:80
+      - 4000:4000
     networks:
       - summarizer
     depends_on:
