@@ -1,5 +1,5 @@
 FROM bellsoft/liberica-openjdk-alpine:21
-WORKDIR /workdir/server
+WORKDIR /app/server
 
 COPY .mvn/ .mvn
 COPY mvnw pom.xml ./
