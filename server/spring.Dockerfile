@@ -7,7 +7,7 @@ RUN ./mvnw dependency:go-offline
 
 COPY src ./src
 
-RUN --mount=type=cache,target=/root/.m2 ./mvnw install -DskipTests
+RUN ./mvnw install -DskipTests
 
 ARG JAR_FILE=target/*.jar
 COPY ${JAR_FILE} target/application.jar
@@ -19,10 +19,9 @@ RUN addgroup -S demo && adduser -S demo -G demo
 EXPOSE 8080
 VOLUME /tmp
 USER demo
-ARG EXTRACTED=/workdir/server/target/extracted
-WORKDIR /workdir/server
+ARG EXTRACTED=/workdir/server/target/
 COPY --from=build ${EXTRACTED}/dependencies/ ./
 COPY --from=build ${EXTRACTED}/spring-boot-loader/ ./
 COPY --from=build ${EXTRACTED}/snapshot-dependencies/ ./
 COPY --from=build ${EXTRACTED}/application/ ./
-ENTRYPOINT ["java","-XX:TieredStopAtLevel=1","-Dspring.main.lazy-initialization=true","org.springframework.boot.loader.launch.JarLauncher"]
+ENTRYPOINT ["java","-noverify","-XX:TieredStopAtLevel=1","-Dspring.main.lazy-initialization=true","org.springframework.boot.loader.JarLauncher"]
