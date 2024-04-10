@@ -13,4 +13,4 @@ COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* ./
 RUN pnpm install --frozen-lockfile
 
 COPY . .
-CMD ["ng", "serve", "--host", "0.0.0.0"]
+CMD ["ng", "serve","--hmr","--host", "0.0.0.0"]

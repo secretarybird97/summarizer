@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.summarizer.backend.entity.User;
 import com.summarizer.backend.repository.UserRepository;
 
-@CrossOrigin(origins = "http://db:3000")
+@CrossOrigin(origins = { "http://localhost:4000", "http://localhost:4200" })
 @RestController
 @RequestMapping("/api")
 public class UserController {

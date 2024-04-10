@@ -31,5 +31,4 @@ COPY --from=extractor ${EXTRACTED}/spring-boot-loader/ ./
 COPY --from=extractor ${EXTRACTED}/snapshot-dependencies/ ./
 COPY --from=extractor ${EXTRACTED}/application/ ./
 
-EXPOSE 8080
 ENTRYPOINT ["java","-XX:TieredStopAtLevel=1","-Dspring.main.lazy-initialization=true","org.springframework.boot.loader.launch.JarLauncher"]

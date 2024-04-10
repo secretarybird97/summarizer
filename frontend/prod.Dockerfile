@@ -15,7 +15,7 @@ RUN pnpm install --frozen-lockfile
 FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN ng build
+RUN ng build --optimization
 
 FROM base AS runner
 
