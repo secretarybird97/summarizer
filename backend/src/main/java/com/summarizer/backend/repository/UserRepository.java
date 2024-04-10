@@ -8,4 +8,6 @@ import com.summarizer.backend.entity.User;
 
 public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findByUsername(String username);
+
+    boolean existsByUsername(String username);
 }
