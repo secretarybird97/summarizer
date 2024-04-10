@@ -1,6 +1,5 @@
 services:
   db:
-    container_name: postgres
     image: postgres
     restart: always
     ports:
@@ -10,10 +9,9 @@ services:
     networks:
       - summarizer
     volumes:
-      - db:/var/lib/postgresql/data
+      - db-data:/var/lib/postgresql/data
 
   pgadmin:
-    container_name: pgadmin
     image: dpage/pgadmin4
     restart: always
     ports:
@@ -23,12 +21,11 @@ services:
     networks:
       - summarizer
     volumes:
-      - pgadmin:/var/lib/pgadmin
+      - pgadmin-data:/var/lib/pgadmin
     depends_on:
       - db
 
   backend:
-    container_name: spring-boot
     restart: always
     build:
       context: ./backend
@@ -52,7 +49,6 @@ services:
       - summarizer
 
   frontend:
-    container_name: angular
     restart: always
     build:
       context: ./frontend
@@ -66,7 +62,8 @@ services:
 
 networks:
   summarizer:
+    driver: bridge
 
 volumes:
-  pgadmin:
-  db:
+  pgadmin-data:
+  db-data:
