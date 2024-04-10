@@ -10,7 +10,7 @@ services:
     networks:
       - summarizer
     volumes:
-      - ./db:/var/lib/postgresql/data
+      - db:/var/lib/postgresql/data
 
   server:
     container_name: spring-boot
@@ -49,3 +49,6 @@ services:
 
 networks:
   summarizer:
+
+volumes:
+  db:

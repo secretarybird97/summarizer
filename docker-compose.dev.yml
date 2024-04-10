@@ -10,7 +10,7 @@ services:
     networks:
       - summarizer
     volumes:
-      - ./db:/var/lib/postgresql/data
+      - db:/var/lib/postgresql/data
 
   pgadmin:
     container_name: pgadmin
@@ -23,7 +23,7 @@ services:
     networks:
       - summarizer
     volumes:
-      - ./pgadmin:/var/lib/pgadmin
+      - pgadmin:/var/lib/pgadmin
     depends_on:
       - db
 
@@ -66,3 +66,7 @@ services:
 
 networks:
   summarizer:
+
+volumes:
+  pgadmin:
+  db:
