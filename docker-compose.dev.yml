@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   db:
     container_name: postgres
@@ -13,6 +11,21 @@ services:
       - summarizer
     volumes:
       - ./db:/var/lib/postgresql/data
+
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    restart: always
+    ports:
+      - "15432:80"
+    env_file:
+      - .env.example
+    networks:
+      - summarizer
+    volumes:
+      - ./pgadmin:/var/lib/pgadmin
+    depends_on:
+      - db
 
   backend:
     container_name: spring-boot
