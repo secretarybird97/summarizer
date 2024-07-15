@@ -6,21 +6,9 @@ services:
       context: ./server
     ports:
       - 8080:8080
+    depends_on:
+      - db
 
-  debug-server:
-    build:
-      context: ./server
-      args:
-        - configuration=Debug
-    ports:
-      - 8081:8080
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-    volumes:
-      - ~/.vsdbg:/remote_debugger:rw
-    profiles:
-      - debug
-  # client service for Angular app
   client:
     build:
       context: ./client
@@ -35,3 +23,32 @@ services:
     #   - server
     # networks:
     #   - aspnetappnetwork
+
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+
+  debug-server:
+    build:
+      context: ./server
+      args:
+        - configuration=Debug
+    ports:
+      - 8081:8080
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    volumes:
+      - ~/.vsdbg:/remote_debugger:rw
+    profiles:
+      - debug
+
+volumes:
+  pgdata:
