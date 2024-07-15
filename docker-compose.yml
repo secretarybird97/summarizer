@@ -36,19 +36,31 @@ services:
     ports:
       - 5432:5432
 
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 15432:8080
+    depends_on:
+      - db
+    profiles:
+      - dev
+
   debug-server:
     build:
       context: ./server
       args:
         - configuration=Debug
     ports:
-      - 8081:8080
+      - 18080:8080
+    depends_on:
+      - db
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     volumes:
       - ~/.vsdbg:/remote_debugger:rw
     profiles:
-      - debug
+      - dev
 
 volumes:
   pgdata:
