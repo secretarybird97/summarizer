@@ -8,12 +8,16 @@ services:
       - 8080:8080
     depends_on:
       - db
+    profiles:
+      - prod
 
   client:
     build:
       context: ./client
+    # environment:
+    # - NODE_ENV=production
     ports:
-      - 3000:80
+      - 4000:4000
     # environment:
     #   - ASPNETCORE_URLS=https://+:443;http://+:80
     #   - ASPNETCORE_HTTPS_PORT=443
@@ -23,6 +27,8 @@ services:
     #   - server
     # networks:
     #   - aspnetappnetwork
+    profiles:
+      - prod
 
   db:
     image: postgres
@@ -46,7 +52,7 @@ services:
     profiles:
       - dev
 
-  debug-server:
+  dev-server:
     build:
       context: ./server
       args:
@@ -59,6 +65,19 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
     volumes:
       - ~/.vsdbg:/remote_debugger:rw
+    profiles:
+      - dev
+
+  dev-client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile.dev
+    ports:
+      - 4200:4200
+    depends_on:
+      - dev-server
+    volumes:
+      - ./client:/app
     profiles:
       - dev
 
