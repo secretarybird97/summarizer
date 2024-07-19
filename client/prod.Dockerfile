@@ -27,6 +27,7 @@ COPY tsconfig.json .
 # ENV ENV_VARIABLE=${ENV_VARIABLE}
 # ARG NEXT_PUBLIC_ENV_VARIABLE
 # ENV NEXT_PUBLIC_ENV_VARIABLE=${NEXT_PUBLIC_ENV_VARIABLE}
+ENV NEXT_TELEMETRY_DISABLED 1
 
 RUN \
     if [ -f yarn.lock ]; then yarn build; \
@@ -53,7 +54,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 # ENV ENV_VARIABLE=${ENV_VARIABLE}
 # ARG NEXT_PUBLIC_ENV_VARIABLE
 # ENV NEXT_PUBLIC_ENV_VARIABLE=${NEXT_PUBLIC_ENV_VARIABLE}
-
+ENV NEXT_TELEMETRY_DISABLED 1
 # Note: Don't expose ports here, Compose will handle that for us
 
 CMD ["node", "server.js"]
