@@ -10,23 +10,24 @@ services:
       - db
     profiles:
       - prod
+    networks:
+      - summarizer_network
 
   client:
+    container_name: client
     build:
       context: ./client
-    # environment:
-    # - NODE_ENV=production
+      dockerfile: prod.Dockerfile
+    restart: always
     ports:
-      - 4000:4000
+      - 3000:3000
     # environment:
     #   - ASPNETCORE_URLS=https://+:443;http://+:80
     #   - ASPNETCORE_HTTPS_PORT=443
     depends_on:
       - server
-    # links:
-    #   - server
-    # networks:
-    #   - aspnetappnetwork
+    networks:
+      - summarizer_network
     profiles:
       - prod
 
@@ -41,6 +42,8 @@ services:
       - pgdata:/var/lib/postgresql/data
     ports:
       - 5432:5432
+    networks:
+      - summarizer_network
 
   adminer:
     image: adminer
@@ -51,6 +54,8 @@ services:
       - db
     profiles:
       - dev
+    networks:
+      - summarizer_network
 
   dev-server:
     build:
@@ -67,19 +72,29 @@ services:
       - ~/.vsdbg:/remote_debugger:rw
     profiles:
       - dev
+    networks:
+      - summarizer_network
 
   dev-client:
     build:
       context: ./client
-      dockerfile: Dockerfile.dev
+      dockerfile: dev.Dockerfile
+    restart: always
     ports:
-      - 4200:4200
+      - 3000:3000
     depends_on:
       - dev-server
     volumes:
-      - ./client:/app
+      - ./client/src:/app/src
+      - ./client/public:/app/public
     profiles:
       - dev
+    networks:
+      - summarizer_network
 
 volumes:
   pgdata:
+
+networks:
+  summarizer_network:
+    external: true
