@@ -49,13 +49,13 @@ async def fetch_article_content(url: str):
 app = FastAPI()
 
 
-@app.post("/summarize_text")
+@app.post("/summarize/text")
 async def summarize_text(text: str = Body(...)):
     summary = await text_summary(text)
     return {"summary": summary}
 
 
-@app.post("/summarize_article")
+@app.post("/summarize/article")
 async def summarize_article(url: str = Body(...)):
     article_text = await fetch_article_content(url)
     if article_text is None:
