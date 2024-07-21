@@ -15,14 +15,14 @@ RUN poetry config virtualenvs.create false && \
     poetry install --no-dev --no-interaction --no-ansi
 
 # Copy project files
-COPY ./llm_microservice ./llm_microservice
+COPY ./llm_api ./llm_api
 
 # Final image
 FROM python:3.10-slim
 
 # Create a non-root user
-RUN addgroup --system --gid 1001 llm_microservice && \
-    adduser --system --uid 1001 llm_microservice
+RUN addgroup --system --gid 1001 llm_api && \
+    adduser --system --uid 1001 llm_api
 
 # Set working directory
 WORKDIR /app
@@ -32,7 +32,7 @@ COPY --from=builder /app /app
 COPY --from=builder /usr/local /usr/local
 
 # Switch to non-root user
-USER llm_microservice
+USER llm_api
 
 # Command to run the application
-CMD ["uvicorn", "llm_microservice.main:app", "--host", "0.0.0.0", "--port", "80"]
+CMD ["uvicorn", "llm_api.main:app", "--host", "0.0.0.0", "--port", "80"]

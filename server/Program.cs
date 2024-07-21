@@ -1,5 +1,25 @@
+using System.ComponentModel.DataAnnotations;
+using System.Text;
+using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using server.Context;
+using server.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
+var connectionStringKey = "POSTGRES_CONNECTION_STRING";
+var connectionString = Environment.GetEnvironmentVariable(connectionStringKey);
+
+if (string.IsNullOrEmpty(connectionString))
+{
+    throw new InvalidOperationException($"Connection string '{connectionStringKey}' not found.");
+}
+
+builder.Services.AddDbContext<SummarizerDbContext>(options => options.UseNpgsql(connectionString));
+builder.Services.AddHttpClient();
+builder.Services.AddScoped<ArticleSummarizationService>();
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -16,29 +36,27 @@ if (app.Environment.IsDevelopment())
 
 // app.UseHttpsRedirection();
 
-var summaries = new[]
+app.MapGet("/users/{userId}/articles", async (SummarizerDbContext dbContext, int userId) =>
 {
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast = Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
+    var articles = await dbContext.ArticleSummaries
+                                   .Where(article => article.UserId == userId)
+                                   .ToListAsync();
+    return articles.Count != 0 ? Results.Ok(articles) : Results.NotFound($"No articles found for user with ID {userId}.");
 })
-.WithName("GetWeatherForecast")
+.WithName("GetArticlesByUserId")
+.WithOpenApi();
+
+app.MapPost("/summarize/article", async (ArticleSummarizationService summarizationService, [FromBody] string url) =>
+{
+    if (string.IsNullOrWhiteSpace(url))
+    {
+        return Results.BadRequest("Request body is missing or invalid.");
+    }
+
+    var summarizedArticle = await summarizationService.GetSummarizedArticleAsync(url);
+    return Results.Ok(summarizedArticle);
+})
+.WithName("SummarizeArticle")
 .WithOpenApi();
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}

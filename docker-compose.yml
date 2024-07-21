@@ -12,6 +12,9 @@ services:
       - prod
     networks:
       - summarizer_network
+    environment:
+      - POSTGRES_CONNECTION_STRING=${POSTGRES_CONNECTION_STRING}
+      - FASTAPI_URL=${FASTAPI_URL}
 
   client:
     container_name: client
@@ -35,9 +38,9 @@ services:
     image: postgres
     restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - pgdata:/var/lib/postgresql/data
     ports:
@@ -54,6 +57,7 @@ services:
       - db
     profiles:
       - dev
+      - adminer
     networks:
       - summarizer_network
 
@@ -97,4 +101,5 @@ volumes:
 
 networks:
   summarizer_network:
-    external: true
+    name: summarizer_network
+    driver: bridge
