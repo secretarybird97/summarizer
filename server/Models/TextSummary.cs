@@ -1,29 +1,36 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace server.Models
+namespace server.Models;
+
+[Table("text_summary")]
+public class TextSummary
 {
-    [Table("TextSummary")]
-    public class TextSummary
-    {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
+    [Column("id")]
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public int Id { get; set; }
 
-        [ForeignKey("User")]
-        public int UserId { get; set; }
+    [Column("title")]
+    [MaxLength(30)]
+    public string? Title { get; set; }
 
-        [Required]
-        public string Input { get; set; }
+    [Column("input_text")]
+    [Required]
+    public string InputText { get; set; } = null!;
 
-        [Required]
-        public string Result { get; set; }
+    [Column("summary")]
+    [Required]
+    public string Summary { get; set; } = null!;
 
-        [Required]
-        public DateTime CreatedAt { get; set; }
+    [Column("created_at")]
+    [Required]
+    public DateTime CreatedAt { get; set; } = DateTime.Now;
 
-        [Required]
-        public User User { get; set; }
-    }
+    [Column("user_id")]
+    [Required]
+    public int UserId { get; set; }
+
+    [ForeignKey("UserId")]
+    public User User { get; set; } = null!;
 }

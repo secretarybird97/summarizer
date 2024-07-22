@@ -14,7 +14,7 @@ services:
       - summarizer_network
     environment:
       - POSTGRES_CONNECTION_STRING=${POSTGRES_CONNECTION_STRING}
-      - FASTAPI_URL=${FASTAPI_URL}
+      - LLM_API_URL=${LLM_API_URL}
 
   client:
     container_name: client

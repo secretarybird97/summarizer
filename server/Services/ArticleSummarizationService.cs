@@ -1,35 +1,26 @@
 ﻿using System.Text;
 using Newtonsoft.Json;
 
-namespace server.Services
+namespace server.Services;
+
+public class ArticleSummarizationService(HttpClient httpClient)
 {
-    public class ArticleSummarizationService(HttpClient httpClient)
-    {
-        private readonly HttpClient _httpClient = httpClient;
-        private readonly string _fastApiBaseUrl = Environment.GetEnvironmentVariable("LLM_API_URL") ?? throw new Exception("FAST_API_BASE_URL environment variable is not set.");
+    private readonly HttpClient _httpClient = httpClient;
+    private readonly string _apiUrl = Environment.GetEnvironmentVariable("LLM_API_URL") ?? throw new ArgumentNullException("LLM_API_URL environment variable not set.");
 
-        public async Task<object?> GetSummarizedArticleAsync(string url)
-        {
-            var content = new StringContent(JsonConvert.SerializeObject(url), Encoding.UTF8, "application/json");
-            var response = await _httpClient.PostAsync($"{_fastApiBaseUrl}/summarize/article", content);
-            if (response.IsSuccessStatusCode)
-            {
-                var responseContent = await response.Content.ReadAsStringAsync();
-                // Deserialize the JSON response into a strongly typed object
-                var responseObject = JsonConvert.DeserializeObject<SummaryResponse>(responseContent);
-                // Return the object directly, letting ASP.NET handle the serialization
-                return responseObject;
-            }
-            else
-            {
-                // Handle the error or return a default message
-                return new { error = "Could not summarize the article." };
-            }
-        }
+    public async Task<string> SummarizeArticle(string url)
+    {
+        var body = new StringContent(JsonConvert.SerializeObject(url), Encoding.UTF8, "application/json");
+        var response = await _httpClient.PostAsync($"{_apiUrl}/summarize/article", body);
+        response.EnsureSuccessStatusCode();
+
+        var responseObject = JsonConvert.DeserializeObject<SummmaryResponse>(await response.Content.ReadAsStringAsync());
+        return responseObject?.Summary ?? string.Empty;
     }
 
-    internal class SummaryResponse
+    internal class SummmaryResponse
     {
-        public string Summary { get; set; }
+        [JsonProperty("summary_text")]
+        public string Summary { get; set; } = string.Empty;
     }
-};
+}

@@ -1,26 +1,25 @@
-using System.ComponentModel.DataAnnotations;
-using System.Text;
-using System.Text.Json.Serialization;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
-using server.Context;
+using server.Data;
 using server.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var connectionStringKey = "POSTGRES_CONNECTION_STRING";
-var connectionString = Environment.GetEnvironmentVariable(connectionStringKey);
+// Add services to the container.
+
+var connectionString = Environment.GetEnvironmentVariable("POSTGRES_CONNECTION_STRING");
 
 if (string.IsNullOrEmpty(connectionString))
 {
-    throw new InvalidOperationException($"Connection string '{connectionStringKey}' not found.");
+    throw new InvalidOperationException("POSTGRES_CONNECTION_STRING environment variable not set.");
 }
 
-builder.Services.AddDbContext<SummarizerDbContext>(options => options.UseNpgsql(connectionString));
-builder.Services.AddHttpClient();
+builder.Services.AddDbContext<SummarizerDbContext>(options =>
+{
+    options.UseNpgsql(connectionString);
+});
+builder.Services.AddHttpClient<ArticleSummarizationService>();
 builder.Services.AddScoped<ArticleSummarizationService>();
-// Add services to the container.
+builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -36,27 +35,8 @@ if (app.Environment.IsDevelopment())
 
 // app.UseHttpsRedirection();
 
-app.MapGet("/users/{userId}/articles", async (SummarizerDbContext dbContext, int userId) =>
-{
-    var articles = await dbContext.ArticleSummaries
-                                   .Where(article => article.UserId == userId)
-                                   .ToListAsync();
-    return articles.Count != 0 ? Results.Ok(articles) : Results.NotFound($"No articles found for user with ID {userId}.");
-})
-.WithName("GetArticlesByUserId")
-.WithOpenApi();
+app.UseAuthorization();
 
-app.MapPost("/summarize/article", async (ArticleSummarizationService summarizationService, [FromBody] string url) =>
-{
-    if (string.IsNullOrWhiteSpace(url))
-    {
-        return Results.BadRequest("Request body is missing or invalid.");
-    }
-
-    var summarizedArticle = await summarizationService.GetSummarizedArticleAsync(url);
-    return Results.Ok(summarizedArticle);
-})
-.WithName("SummarizeArticle")
-.WithOpenApi();
+app.MapControllers();
 
 app.Run();

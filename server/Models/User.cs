@@ -1,32 +1,29 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace server.Models
+namespace server.Models;
+
+[Table("user")]
+public class User
 {
-    [Table("User")]
-    public class User
-    {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
+    [Column("id")]
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public int Id { get; set; }
 
-        [Required]
-        [MinLength(3)]
-        [MaxLength(50)]
-        public required string Name { get; set; }
+    [Column("username")]
+    [Required]
+    [MinLength(3)]
+    [MaxLength(50)]
+    public string Username { get; set; } = null!;
 
-        [Required]
-        [MaxLength(50)]
-        public required string Email { get; set; }
+    [Column("password")]
+    [Required]
+    [MinLength(8)]
+    [MaxLength(50)]
+    public string Password { get; set; } = null!;
 
-        [Required]
-        [MinLength(8)]
-        [MaxLength(50)]
-        public required string Password { get; set; }
+    public ICollection<ArticleSummary> ArticleSummaries { get; set; } = [];
 
-        public ICollection<TextSummary> TextSummaries { get; set; }
-
-        public ICollection<ArticleSummary> ArticleSummaries { get; set; }
-    }
-
+    public ICollection<TextSummary> TextSummaries { get; set; } = [];
 }

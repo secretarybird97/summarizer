@@ -4,8 +4,8 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:27581",
-      "sslPort": 44323
+      "applicationUrl": "http://localhost:50090",
+      "sslPort": 44388
     }
   },
   "profiles": {
@@ -14,7 +14,7 @@
       "dotnetRunMessages": true,
       "launchBrowser": true,
       "launchUrl": "swagger",
-      "applicationUrl": "http://localhost:5265",
+      "applicationUrl": "http://localhost:5248",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "POSTGRES_CONNECTION_STRING": "Host=localhost;Database=summarizer_db;Username=postgres;Password=postgres;",
@@ -26,7 +26,7 @@
       "dotnetRunMessages": true,
       "launchBrowser": true,
       "launchUrl": "swagger",
-      "applicationUrl": "https://localhost:7093;http://localhost:5265",
+      "applicationUrl": "https://localhost:7058;http://localhost:5248",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "POSTGRES_CONNECTION_STRING": "Host=localhost;Database=summarizer_db;Username=postgres;Password=postgres;",

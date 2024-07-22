@@ -1,32 +1,36 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace server.Models
+namespace server.Models;
+
+[Table("article_summary")]
+public class ArticleSummary
 {
-    [Table("ArticleSummary")]
-    public class ArticleSummary
-    {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
+    [Column("id")]
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public int Id { get; set; }
 
-        [ForeignKey("User")]
-        public int UserId { get; set; }
+    [Column("title")]
+    [MaxLength(30)]
+    public string? Title { get; set; }
 
-        public string Title { get; set; }
+    [Column("url")]
+    [Required]
+    public string Url { get; set; } = null!;
 
-        [Required]
-        public string Url { get; set; }
+    [Column("summary")]
+    [Required]
+    public string Summary { get; set; } = null!;
 
-        [Required]
-        public string Result { get; set; }
+    [Column("created_at")]
+    [Required]
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-        [Required]
-        public DateTime CreatedAt { get; set; }
+    [Column("user_id")]
+    [Required]
+    public int UserId { get; set; }
 
-        [Required]
-        public User User { get; set; }
-
-    }
-};
-
+    [ForeignKey("UserId")]
+    public User User { get; set; } = null!;
+}

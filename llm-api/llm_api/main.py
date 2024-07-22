@@ -52,7 +52,7 @@ app = FastAPI()
 @app.post("/summarize/text")
 async def summarize_text(text: str = Body(...)):
     summary = await text_summary(text)
-    return {"summary": summary}
+    return {"summary_text": summary}
 
 
 @app.post("/summarize/article")
@@ -63,4 +63,4 @@ async def summarize_article(url: str = Body(...)):
             status_code=404, detail="Failed to fetch the article content"
         )
     summary = await text_summary(article_text)
-    return {"summary": summary}
+    return {"summary_text": summary}
