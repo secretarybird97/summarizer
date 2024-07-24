@@ -7,16 +7,10 @@ namespace server.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class ArticleSummaryController : ControllerBase
+public class ArticleSummaryController(SummarizerDbContext context, SummarizationService summarizationService) : ControllerBase
 {
-    private readonly SummarizerDbContext _context;
-    private readonly ArticleSummarizationService _summarizationService;
-
-    public ArticleSummaryController(SummarizerDbContext context, ArticleSummarizationService summarizationService)
-    {
-        _context = context;
-        _summarizationService = summarizationService;
-    }
+    private readonly SummarizerDbContext _context = context;
+    private readonly SummarizationService _summarizationService = summarizationService;
 
     [HttpGet(Name = "GetArticleSummaries")]
     public IEnumerable<ArticleSummary> Get()
@@ -32,8 +26,8 @@ public class ArticleSummaryController : ControllerBase
         .ToArray();
     }
 
-    [HttpPost(Name = "SummarizeArticle")]
-    public async Task<ActionResult> SummarizeArticle([FromBody] string url)
+    [HttpPost(Name = "PostArticleSummary")]
+    public async Task<ActionResult> Post([FromBody] string url)
     {
         var summary = await _summarizationService.SummarizeArticle(url);
         var articleSummary = new ArticleSummary
@@ -48,5 +42,6 @@ public class ArticleSummaryController : ControllerBase
         // await _context.SaveChangesAsync();
 
         return Ok(new { articleSummary });
+        // return CreatedAtAction(nameof(GetArticleSummary), new { id = articleSummary.Id }, articleSummary);
     }
 }

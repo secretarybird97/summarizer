@@ -17,8 +17,8 @@ builder.Services.AddDbContext<SummarizerDbContext>(options =>
 {
     options.UseNpgsql(connectionString);
 });
-builder.Services.AddHttpClient<ArticleSummarizationService>();
-builder.Services.AddScoped<ArticleSummarizationService>();
+builder.Services.AddHttpClient<SummarizationService>();
+builder.Services.AddScoped<SummarizationService>();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
