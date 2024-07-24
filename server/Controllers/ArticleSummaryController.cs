@@ -17,11 +17,11 @@ public class ArticleSummaryController(SummarizerDbContext context, Summarization
     {
         return Enumerable.Range(1, 5).Select(index => new ArticleSummary
         {
-            Id = index,
+            Id = Guid.NewGuid().ToString(),
             Title = $"Article {index}",
             Summary = "This is a summary of the article.",
             Url = $"https://example.com/article/{index}",
-            UserId = 1
+            UserId = Guid.Empty.ToString()
         })
         .ToArray();
     }
@@ -35,7 +35,7 @@ public class ArticleSummaryController(SummarizerDbContext context, Summarization
             Title = "Article",
             Summary = summary,
             Url = url,
-            UserId = 1
+            UserId = Guid.Empty.ToString()
         };
 
         // _context.ArticleSummaries.Add(articleSummary);

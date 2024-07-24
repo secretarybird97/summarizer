@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using server.Data;
+using server.Models;
 using server.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,6 +18,10 @@ builder.Services.AddDbContext<SummarizerDbContext>(options =>
 {
     options.UseNpgsql(connectionString);
 });
+builder.Services.AddIdentityApiEndpoints<User>()
+    .AddEntityFrameworkStores<SummarizerDbContext>();
+builder.Services.AddAuthorization();
+
 builder.Services.AddHttpClient<SummarizationService>();
 builder.Services.AddScoped<SummarizationService>();
 builder.Services.AddControllers();
@@ -34,6 +39,8 @@ if (app.Environment.IsDevelopment())
 }
 
 // app.UseHttpsRedirection();
+
+app.MapIdentityApi<User>();
 
 app.UseAuthorization();
 
