@@ -6,32 +6,100 @@ services:
       context: ./server
     ports:
       - 8080:8080
-
-  debug-server:
-    build:
-      context: ./server
-      args:
-        - configuration=Debug
-    ports:
-      - 8081:8080
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-    volumes:
-      - ~/.vsdbg:/remote_debugger:rw
+    depends_on:
+      - db
     profiles:
-      - debug
-  # client service for Angular app
+      - prod
+    networks:
+      - summarizer_network
+    environment:
+      - POSTGRES_CONNECTION_STRING=${POSTGRES_CONNECTION_STRING}
+      - LLM_API_URL=${LLM_API_URL}
+
   client:
+    container_name: client
     build:
       context: ./client
+      dockerfile: prod.Dockerfile
+    restart: always
     ports:
-      - 3000:80
+      - 3000:3000
     # environment:
     #   - ASPNETCORE_URLS=https://+:443;http://+:80
     #   - ASPNETCORE_HTTPS_PORT=443
     depends_on:
       - server
-    # links:
-    #   - server
-    # networks:
-    #   - aspnetappnetwork
+    networks:
+      - summarizer_network
+    profiles:
+      - prod
+
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    networks:
+      - summarizer_network
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 15432:8080
+    depends_on:
+      - db
+    profiles:
+      - dev
+      - adminer
+    networks:
+      - summarizer_network
+
+  dev-server:
+    build:
+      context: ./server
+      args:
+        - configuration=Debug
+    ports:
+      - 18080:8080
+    depends_on:
+      - db
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    volumes:
+      - ~/.vsdbg:/remote_debugger:rw
+    profiles:
+      - dev
+    networks:
+      - summarizer_network
+
+  dev-client:
+    build:
+      context: ./client
+      dockerfile: dev.Dockerfile
+    restart: always
+    ports:
+      - 3000:3000
+    depends_on:
+      - dev-server
+    volumes:
+      - ./client/src:/app/src
+      - ./client/public:/app/public
+    profiles:
+      - dev
+    networks:
+      - summarizer_network
+
+volumes:
+  pgdata:
+
+networks:
+  summarizer_network:
+    name: summarizer_network
+    driver: bridge

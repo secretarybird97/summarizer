@@ -1,6 +1,30 @@
+using Microsoft.EntityFrameworkCore;
+using server.Data;
+using server.Models;
+using server.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+var connectionString = Environment.GetEnvironmentVariable("POSTGRES_CONNECTION_STRING");
+
+if (string.IsNullOrEmpty(connectionString))
+{
+    throw new InvalidOperationException("POSTGRES_CONNECTION_STRING environment variable not set.");
+}
+
+builder.Services.AddDbContext<SummarizerDbContext>(options =>
+{
+    options.UseNpgsql(connectionString);
+});
+builder.Services.AddIdentityApiEndpoints<User>()
+    .AddEntityFrameworkStores<SummarizerDbContext>();
+builder.Services.AddAuthorization();
+
+builder.Services.AddHttpClient<SummarizationService>();
+builder.Services.AddScoped<SummarizationService>();
+builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -14,31 +38,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+app.MapIdentityApi<User>();
 
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast")
-.WithOpenApi();
+app.UseAuthorization();
+
+app.MapControllers();
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
