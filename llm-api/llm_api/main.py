@@ -10,7 +10,6 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-# Ensure the model is loaded once
 summarizer = pipeline("summarization", model="facebook/bart-large-cnn", device=DEVICE)
 
 

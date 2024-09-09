@@ -16,18 +16,7 @@ RUN \
     else echo "Warning: Lockfile not found. It is recommended to commit lockfiles to version control." && yarn install; \
     fi
 
-COPY src ./src
-COPY public ./public
-COPY next.config.js .
-COPY tsconfig.json .
-
-# Environment variables must be present at build time
-# https://github.com/vercel/next.js/discussions/14030
-# ARG ENV_VARIABLE
-# ENV ENV_VARIABLE=${ENV_VARIABLE}
-# ARG NEXT_PUBLIC_ENV_VARIABLE
-# ENV NEXT_PUBLIC_ENV_VARIABLE=${NEXT_PUBLIC_ENV_VARIABLE}
-ENV NEXT_TELEMETRY_DISABLED 1
+COPY . .
 
 RUN \
     if [ -f yarn.lock ]; then yarn build; \
@@ -39,22 +28,18 @@ RUN \
 FROM base AS runner
 # Don't run production as root
 RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
-USER nextjs
+RUN adduser --system --uid 1001 remix
+USER remix
 
-COPY --from=builder /app/public ./public
-
-# Automatically leverage output traces to reduce image size
-# https://nextjs.org/docs/advanced-features/output-file-tracing
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --from=builder --chown=remix:nodejs /app/public ./public
+COPY --from=builder --chown=remix:nodejs /app/build ./build
+COPY --from=builder --chown=remix:nodejs /app/node_modules ./node_modules
 
 # Environment variables must be redefined at run time
 # ARG ENV_VARIABLE
 # ENV ENV_VARIABLE=${ENV_VARIABLE}
 # ARG NEXT_PUBLIC_ENV_VARIABLE
 # ENV NEXT_PUBLIC_ENV_VARIABLE=${NEXT_PUBLIC_ENV_VARIABLE}
-ENV NEXT_TELEMETRY_DISABLED 1
 # Note: Don't expose ports here, Compose will handle that for us
 
-CMD ["node", "server.js"]
+CMD ["node", "node_modules/.bin/remix-serve", "build/server/index.js"]
