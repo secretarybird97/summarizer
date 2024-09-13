@@ -1,0 +1,49 @@
+name: Deploy to ACI
+
+on:
+  workflow_run:
+    workflows: ["Build and push container images"]
+    types:
+      - completed
+
+env: # FOR DOCKER COMPOSE
+  GITHUB_SHA: ${{ github.sha }}
+  POSTGRES_CONNECTION_STRING: ${{ secrets.POSTGRES_CONNECTION_STRING }}
+  LLM_API_URL: ${{ secrets.LLM_API_URL }}
+  POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+  POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+  POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Login via Azure CLI"
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Lowercase the repo name and username
+        run: echo "REPO=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
+
+      - name: Create Docker ACI context
+        run: docker context create aci aci-context
+
+      - name: Set up ACI context
+        run: docker context use aci-context --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --subscription-id ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy to ACI
+        run: docker compose -f ci/docker-compose.yml up -d
+
+      - name: Run database migrations
+        run: docker exec -it server dotnet ef migrations script --idempotent --output /migrations/migration.sql
+
+      - name: Apply database migrations
+        run: docker exec -it db psql -U ${POSTGRES_USER} -d ${POSTGRES_DB} -f /migrations/migration.sql
+        # TODO: Check action

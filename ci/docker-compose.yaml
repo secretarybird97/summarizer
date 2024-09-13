@@ -1,0 +1,59 @@
+# Please refer https://aka.ms/HTTPSinContainer on how to setup an https developer certificate for your ASP.NET Core service.
+
+services:
+  server:
+    image: ghcr.io/$(REPO)/server:$(GITHUB_SHA)
+    ports:
+      - 8080:8080
+    depends_on:
+      - db
+    networks:
+      - summarizer_network
+    environment:
+      - POSTGRES_CONNECTION_STRING=${POSTGRES_CONNECTION_STRING}
+      - LLM_API_URL=${LLM_API_URL}
+    volumes:
+      - migrations:/migrations
+
+  client:
+    image: ghcr.io/$(REPO)/client:$(GITHUB_SHA)
+    restart: always
+    ports:
+      - 3000:3000
+    # environment:
+    #   - ASPNETCORE_URLS=https://+:443;http://+:80
+    #   - ASPNETCORE_HTTPS_PORT=443
+    depends_on:
+      - server
+    networks:
+      - summarizer_network
+
+  fastapi:
+    image: ghcr.io/$(REPO)/fastapi:$(GITHUB_SHA)
+    restart: always
+    ports:
+      - 8000:8000 # TODO: test this
+
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - migrations:/migrations
+    ports:
+      - 5432:5432
+    networks:
+      - summarizer_network
+
+volumes:
+  pgdata:
+  migrations:
+
+networks:
+  summarizer_network:
+    name: summarizer_network
+    driver: bridge
