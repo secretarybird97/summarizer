@@ -2,7 +2,7 @@
 
 services:
   server:
-    image: ghcr.io/$(REPO)/server:$(GITHUB_SHA)
+    image: ghcr.io/$REPO/server:$GITHUB_SHA
     depends_on:
       - db
     networks:
@@ -14,7 +14,7 @@ services:
       - migrations:/migrations
 
   client:
-    image: ghcr.io/$(REPO)/client:$(GITHUB_SHA)
+    image: ghcr.io/$REPO/client:$GITHUB_SHA
     restart: always
     ports:
       - 3000:3000 # TODO: Add HTTPS support
@@ -26,7 +26,7 @@ services:
       - summarizer_network
 
   fastapi:
-    image: ghcr.io/$(REPO)/fastapi:$(GITHUB_SHA)
+    image: ghcr.io/$REPO/fastapi:$GITHUB_SHA
     restart: always
     networks:
       - summarizer_network
