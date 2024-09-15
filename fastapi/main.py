@@ -3,8 +3,9 @@ import logging
 import httpx
 import torch
 from bs4 import BeautifulSoup
-from fastapi import Body, FastAPI, HTTPException
 from transformers import pipeline
+
+from fastapi import Body, FastAPI, HTTPException
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

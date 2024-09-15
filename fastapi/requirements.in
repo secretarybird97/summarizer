@@ -1,0 +1,6 @@
+fastapi
+torch
+transformers
+uvicorn
+beautifulsoup4
+httpx
