@@ -13,8 +13,8 @@ services:
       - LLM_API_URL="http://fastapi:8000"
     profiles:
       - prod
-    volumes:
-      - migrations:/migrations
+    # volumes:
+    #   - migrations:/migrations
 
   client:
     container_name: summarizer-client
@@ -46,7 +46,7 @@ services:
     container_name: summarizer-migrations
     build:
       context: ../server
-      dockerfile: ./migrations/Dockerfile
+      dockerfile: migration.Dockerfile
     depends_on:
       - db
     networks:
