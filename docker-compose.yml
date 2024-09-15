@@ -4,10 +4,9 @@ services:
   server:
     build:
       context: ./server
-    ports:
-      - 8080:8080
     depends_on:
       - db
+      - fastapi
     profiles:
       - prod
     networks:
@@ -15,6 +14,9 @@ services:
     environment:
       - POSTGRES_CONNECTION_STRING=${POSTGRES_CONNECTION_STRING}
       - LLM_API_URL=${LLM_API_URL}
+    # environment:
+    #   - ASPNETCORE_URLS=https://+:443;http://+:80
+    #   - ASPNETCORE_HTTPS_PORT=443
 
   client:
     container_name: client
@@ -24,18 +26,29 @@ services:
     restart: always
     ports:
       - 3000:3000
-    # environment:
-    #   - ASPNETCORE_URLS=https://+:443;http://+:80
-    #   - ASPNETCORE_HTTPS_PORT=443
     depends_on:
       - server
     networks:
       - summarizer_network
     profiles:
       - prod
+    environment:
+      - BACKEND_URL=${BACKEND_URL}
+
+  fastapi:
+    build:
+      context: ./fastapi
+    restart: always
+    networks:
+      - summarizer_network
+    profiles:
+      - prod
+      - dev
+    volumes:
+      - fastapi_data:/app/.cache
 
   db:
-    image: postgres
+    image: postgres:16
     restart: always
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
@@ -98,6 +111,7 @@ services:
 
 volumes:
   pgdata:
+  fastapi_data:
 
 networks:
   summarizer_network:

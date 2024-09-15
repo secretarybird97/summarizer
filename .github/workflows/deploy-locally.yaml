@@ -1,0 +1,32 @@
+name: Deploy locally
+
+on:
+  workflow_run:
+    workflows: ["Build and push container images"]
+    types:
+      - completed
+
+env:
+  REPO: ${{ github.repository }}
+  GITHUB_SHA: ${{ github.sha }}
+  POSTGRES_CONNECTION_STRING: "Host=db;Database=${{secrets.POSTGRES_DB}};Username=${{secrets.POSTGRES_USER}};Password=${{secrets.POSTGRES_PASSWORD}};"
+  POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+  POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+  POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy to self host
+        run: docker compose -f ci/docker-compose.yml up -d
+
+      - name: Run database migrations
+        run: docker exec -it server dotnet ef migrations script --idempotent --output /migrations/migration.sql
+
+      - name: Apply database migrations
+        run: docker exec -it db psql -U ${POSTGRES_USER} -d ${POSTGRES_DB} -f /migrations/migration.sql
+        # TODO: Check action

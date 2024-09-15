@@ -3,15 +3,13 @@
 services:
   server:
     image: ghcr.io/$(REPO)/server:$(GITHUB_SHA)
-    ports:
-      - 8080:8080
     depends_on:
       - db
     networks:
       - summarizer_network
     environment:
       - POSTGRES_CONNECTION_STRING=${POSTGRES_CONNECTION_STRING}
-      - LLM_API_URL=${LLM_API_URL}
+      - LLM_API_URL="http://fastapi:8000"
     volumes:
       - migrations:/migrations
 
@@ -19,10 +17,9 @@ services:
     image: ghcr.io/$(REPO)/client:$(GITHUB_SHA)
     restart: always
     ports:
-      - 3000:3000
-    # environment:
-    #   - ASPNETCORE_URLS=https://+:443;http://+:80
-    #   - ASPNETCORE_HTTPS_PORT=443
+      - 3000:3000 # TODO: Add HTTPS support
+    environment:
+      - BACKEND_URL="http://server:8080"
     depends_on:
       - server
     networks:
@@ -31,11 +28,16 @@ services:
   fastapi:
     image: ghcr.io/$(REPO)/fastapi:$(GITHUB_SHA)
     restart: always
-    ports:
-      - 8000:8000 # TODO: test this
+    networks:
+      - summarizer_network
+    profiles:
+      - prod
+      - dev
+    volumes:
+      - fastapi_data:/app/.cache
 
   db:
-    image: postgres
+    image: postgres:16
     restart: always
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
@@ -44,14 +46,13 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
       - migrations:/migrations
-    ports:
-      - 5432:5432
     networks:
       - summarizer_network
 
 volumes:
   pgdata:
   migrations:
+  fastapi_data:
 
 networks:
   summarizer_network:
