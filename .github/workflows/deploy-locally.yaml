@@ -24,12 +24,23 @@ jobs:
 
       - name: Deploy to self host
         run: docker compose -f ci/docker-compose.yml --profile prod up -d
+        env:
+          POSTGRES_CONNECTION_STRING: ${{env.POSTGRES_CONNECTION_STRING}}
+          POSTGRES_USER: ${{env.POSTGRES_USER}}
+          POSTGRES_DB: ${{env.POSTGRES_DB}}
+          POSTGRES_PASSWORD: ${{env.POSTGRES_PASSWORD}}
 
       - name: Run database migrations
         run: docker compose -f ci/docker-compose.yml run --rm migrations
+        env:
+          POSTGRES_CONNECTION_STRING: ${{env.POSTGRES_CONNECTION_STRING}}
 
       - name: Apply database migrations
         run: PGPASSWORD=${POSTGRES_PASSWORD} docker exec summarizer-db psql -U ${{env.POSTGRES_USER}} -d ${{env.POSTGRES_DB}} -f /migrations/migration.sql
+        env:
+          POSTGRES_USER: ${{env.POSTGRES_USER}}
+          POSTGRES_DB: ${{env.POSTGRES_DB}}
+          POSTGRES_PASSWORD: ${{env.POSTGRES_PASSWORD}}
 
       - name: Clean up docker images
         run: docker system prune -a -f
