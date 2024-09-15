@@ -31,16 +31,16 @@ services:
     networks:
       - summarizer_network
 
-  fastapi:
-    container_name: summarizer-fastapi
-    image: ghcr.io/$REPO/fastapi:$GITHUB_SHA
-    restart: always
-    networks:
-      - summarizer_network
-    profiles:
-      - prod
-    volumes:
-      - fastapi_data:/app/.cache
+  # fastapi:
+  #   container_name: summarizer-fastapi
+  #   image: ghcr.io/$REPO/fastapi:$GITHUB_SHA
+  #   restart: always
+  #   networks:
+  #     - summarizer_network
+  #   profiles:
+  #     - prod
+  #   volumes:
+  #     - fastapi_data:/app/.cache
 
   migrations:
     container_name: summarizer-migrations
