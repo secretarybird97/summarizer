@@ -11,6 +11,8 @@ services:
     environment:
       - POSTGRES_CONNECTION_STRING=${POSTGRES_CONNECTION_STRING}
       - LLM_API_URL="http://fastapi:8000"
+    profiles:
+      - prod
     volumes:
       - migrations:/migrations
 
@@ -24,6 +26,8 @@ services:
       - BACKEND_URL="http://server:8080"
     depends_on:
       - server
+    profiles:
+      - prod
     networks:
       - summarizer_network
 
@@ -35,9 +39,24 @@ services:
       - summarizer_network
     profiles:
       - prod
-      - dev
     volumes:
       - fastapi_data:/app/.cache
+
+  migrations:
+    container_name: summarizer-migrations
+    build:
+      context: ../server
+      dockerfile: ./migrations/Dockerfile
+    depends_on:
+      - db
+    networks:
+      - summarizer_network
+    environment:
+      - POSTGRES_CONNECTION_STRING=${POSTGRES_CONNECTION_STRING}
+    volumes:
+      - migrations:/migrations
+    profiles:
+      - migrations
 
   db:
     container_name: summarizer-db
