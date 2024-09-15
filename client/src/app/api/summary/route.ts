@@ -4,7 +4,8 @@ export async function POST(request: NextRequest) {
   const { url } = await request.json();
 
   try {
-    const data = await fetch(process.env.BACKEND_URL + "/ArticleSummary", {
+    const backendUrl = process.env.BACKEND_URL?.replace(/\/$/, "");
+    const data = await fetch(`${backendUrl}/ArticleSummary`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
