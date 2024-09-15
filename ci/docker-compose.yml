@@ -2,6 +2,7 @@
 
 services:
   server:
+    container_name: summarizer-server
     image: ghcr.io/$REPO/server:$GITHUB_SHA
     depends_on:
       - db
@@ -14,6 +15,7 @@ services:
       - migrations:/migrations
 
   client:
+    container_name: summarizer-client
     image: ghcr.io/$REPO/client:$GITHUB_SHA
     restart: always
     ports:
@@ -26,6 +28,7 @@ services:
       - summarizer_network
 
   fastapi:
+    container_name: summarizer-fastapi
     image: ghcr.io/$REPO/fastapi:$GITHUB_SHA
     restart: always
     networks:
@@ -37,6 +40,7 @@ services:
       - fastapi_data:/app/.cache
 
   db:
+    container_name: summarizer-db
     image: postgres:16
     restart: always
     environment:

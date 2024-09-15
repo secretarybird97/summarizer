@@ -26,8 +26,8 @@ jobs:
         run: docker compose -f ci/docker-compose.yml up -d
 
       - name: Run database migrations
-        run: docker exec -it server dotnet ef migrations script --idempotent --output /migrations/migration.sql
+        run: docker exec -it summarizer-server dotnet ef migrations script --idempotent --output /migrations/migration.sql
 
       - name: Apply database migrations
-        run: docker exec -it db psql -U ${POSTGRES_USER} -d ${POSTGRES_DB} -f /migrations/migration.sql
+        run: PGPASSWORD=${POSTGRES_PASSWORD} docker exec -it summarizer-db psql -U ${{env.POSTGRES_USER}} -d ${{env.POSTGRES_DB}} -f /migrations/migration.sql
         # TODO: Check action

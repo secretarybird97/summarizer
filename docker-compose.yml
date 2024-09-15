@@ -19,7 +19,6 @@ services:
     #   - ASPNETCORE_HTTPS_PORT=443
 
   client:
-    container_name: client
     build:
       context: ./client
       dockerfile: prod.Dockerfile
