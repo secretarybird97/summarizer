@@ -5,6 +5,8 @@ export async function POST(request: NextRequest) {
 
   try {
     const backendUrl = process.env.BACKEND_URL?.replace(/\/$/, "");
+    console.log(process.env.BACKEND_URL);
+    console.log(`Backend URL: ${backendUrl}`);
     const data = await fetch(`${backendUrl}/ArticleSummary`, {
       method: "POST",
       headers: {
