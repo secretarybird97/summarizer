@@ -47,6 +47,8 @@ services:
     build:
       context: ../server
       dockerfile: migration.Dockerfile
+      args:
+        - POSTGRES_CONNECTION_STRING=${POSTGRES_CONNECTION_STRING}
     depends_on:
       - db
     networks:
