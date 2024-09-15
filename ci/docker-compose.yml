@@ -23,7 +23,7 @@ services:
     ports:
       - 3000:3000 # TODO: Add HTTPS support
     environment:
-      - BACKEND_URL="http://summarizer-server:8080"
+      - BACKEND_URL="http://server:8080"
     depends_on:
       - server
     profiles:
