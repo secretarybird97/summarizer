@@ -3,22 +3,20 @@
 services:
   server:
     container_name: summarizer-server
-    image: ghcr.io/$REPO/server:$GITHUB_SHA
+    image: ghcr.io/$REPO/server:latest
     depends_on:
       - db
     networks:
       - summarizer_network
     environment:
       - POSTGRES_CONNECTION_STRING=${POSTGRES_CONNECTION_STRING}
-      - LLM_API_URL="http://fastapi:8000"
+      - LLM_API_URL=http://fastapi:8000
     profiles:
       - prod
-    # volumes:
-    #   - migrations:/migrations
 
   client:
     container_name: summarizer-client
-    image: ghcr.io/$REPO/client:$GITHUB_SHA
+    image: ghcr.io/$REPO/client:latest
     restart: always
     ports:
       - 3000:3000 # TODO: Add HTTPS support
@@ -31,7 +29,7 @@ services:
 
   fastapi:
     container_name: summarizer-fastapi
-    image: ghcr.io/$REPO/fastapi:$GITHUB_SHA
+    image: ghcr.io/$REPO/fastapi:latest
     restart: always
     networks:
       - summarizer_network
