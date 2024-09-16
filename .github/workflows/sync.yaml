@@ -1,0 +1,33 @@
+name: Synchronize Workflows
+
+on:
+  workflow_run:
+    workflows:
+      - "Build and push client image"
+      - "Build and push server image"
+      - "Build and push fastapi image"
+    types:
+      - completed
+
+jobs:
+  synchronize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check workflow status
+        id: check_status
+        run: |
+          client_status=$(gh run list --workflow="Build and push client image" --branch=main --limit=1 --json conclusion -q '.[0].conclusion')
+          server_status=$(gh run list --workflow="Build and push server image" --branch=main --limit=1 --json conclusion -q '.[0].conclusion')
+          fastapi_status=$(gh run list --workflow="Build and push fastapi image" --branch=main --limit=1 --json conclusion -q '.[0].conclusion')
+
+          if [[ "$client_status" == "success" && "$server_status" == "success" && "$fastapi_status" == "success" ]]; then
+            echo "All workflows completed successfully."
+            echo "status=success" >> $GITHUB_ENV
+          else
+            echo "One or more workflows failed."
+            echo "status=failure" >> $GITHUB_ENV
+
+      - name: Trigger deploy workflow
+        if: env.status == 'success'
+        run: |
+          gh workflow run "Deploy locally"

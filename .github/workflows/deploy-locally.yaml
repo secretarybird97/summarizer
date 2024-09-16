@@ -1,8 +1,9 @@
 name: Deploy locally
 
 on:
+  workflow_dispatch:
   workflow_run:
-    workflows: ["Build and push container images"]
+    workflows: ["Synchronize Workflows"]
     types:
       - completed
 

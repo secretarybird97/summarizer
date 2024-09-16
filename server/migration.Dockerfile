@@ -9,5 +9,4 @@ COPY ["server.csproj", "./"]
 RUN dotnet restore "server.csproj"
 COPY . .
 WORKDIR "/src/."
-RUN dotnet build "server.csproj" -c $configuration -o /app/build
 RUN dotnet ef migrations script --idempotent --output /migrations/migration.sql
