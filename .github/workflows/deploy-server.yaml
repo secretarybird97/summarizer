@@ -1,0 +1,44 @@
+name: Deploy server
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["Build and push server image"]
+    types:
+      - completed
+
+env:
+  REPO: ${{ github.repository }}
+  GITHUB_SHA: ${{ github.sha }}
+  POSTGRES_CONNECTION_STRING: "Host=db;Database=${{secrets.POSTGRES_DB}};Username=${{secrets.POSTGRES_USER}};Password=${{secrets.POSTGRES_PASSWORD}};"
+  POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+  POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+  POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    if: github.event.workflow_run.conclusion == 'success'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy to self host
+        run: docker compose -f ci/docker-compose.yml up server -d
+        env:
+          POSTGRES_CONNECTION_STRING: ${{env.POSTGRES_CONNECTION_STRING}}
+          POSTGRES_USER: ${{env.POSTGRES_USER}}
+          POSTGRES_DB: ${{env.POSTGRES_DB}}
+          POSTGRES_PASSWORD: ${{env.POSTGRES_PASSWORD}}
+
+      - name: Run database migrations
+        run: docker compose -f ci/docker-compose.yml run --rm migrations
+        env:
+          POSTGRES_CONNECTION_STRING: ${{env.POSTGRES_CONNECTION_STRING}}
+
+      - name: Apply database migrations
+        run: PGPASSWORD=${POSTGRES_PASSWORD} docker exec summarizer-db psql -U ${{env.POSTGRES_USER}} -d ${{env.POSTGRES_DB}} -f /migrations/migration.sql
+        env:
+          POSTGRES_USER: ${{env.POSTGRES_USER}}
+          POSTGRES_DB: ${{env.POSTGRES_DB}}
+          POSTGRES_PASSWORD: ${{env.POSTGRES_PASSWORD}}
