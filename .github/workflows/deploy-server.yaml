@@ -14,6 +14,7 @@ env:
   POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
   POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
   POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+  LLM_API_URL: http://fastapi:8000
 
 jobs:
   deploy:
@@ -30,6 +31,7 @@ jobs:
           POSTGRES_USER: ${{env.POSTGRES_USER}}
           POSTGRES_DB: ${{env.POSTGRES_DB}}
           POSTGRES_PASSWORD: ${{env.POSTGRES_PASSWORD}}
+          LLM_API_URL: ${{env.LLM_API_URL}}
 
       - name: Run database migrations
         run: docker compose -f ci/docker-compose.yml run --rm migrations

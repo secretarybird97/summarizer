@@ -11,7 +11,7 @@ services:
       - summarizer_network
     environment:
       - POSTGRES_CONNECTION_STRING=${POSTGRES_CONNECTION_STRING}
-      - LLM_API_URL=http://fastapi:8000
+      - LLM_API_URL=${LLM_API_URL}
     profiles:
       - prod
 
