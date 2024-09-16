@@ -3,6 +3,7 @@
 services:
   server:
     container_name: summarizer-server
+    restart: always
     image: ghcr.io/$REPO/server:latest
     depends_on:
       - db
