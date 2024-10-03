@@ -22,8 +22,8 @@ builder.Services.AddIdentityApiEndpoints<User>()
     .AddEntityFrameworkStores<SummarizerDbContext>();
 builder.Services.AddAuthorization();
 
-builder.Services.AddHttpClient<SummarizationService>();
-builder.Services.AddScoped<SummarizationService>();
+builder.Services.AddHttpClient<SummaryService>();
+builder.Services.AddScoped<SummaryService>();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

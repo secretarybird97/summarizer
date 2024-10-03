@@ -7,30 +7,28 @@ namespace server.Controllers;
 [ApiController]
 [Route("[controller]")]
 [Produces("application/json")]
-public class SummarizeController(SummarizationService summarizationService, ILogger<SummarizeController> logger) : ControllerBase
+public class SummarizeController(SummaryService summaryService, ILogger<SummarizeController> logger) : ControllerBase
 {
-    private readonly SummarizationService _summarizationService = summarizationService;
+    private readonly SummaryService _summaryService = summaryService;
     private readonly ILogger<SummarizeController> _logger = logger;
 
     [HttpPost("text", Name = "SummarizeText")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<SuccessDetails>> SummarizeText([FromBody] string text)
+    public async Task<ActionResult<SuccessDetails>> SummarizeText([FromBody] TextSummaryRequest request)
     {
-        _logger.LogInformation("Summarizing text: {text}", text);
-        if (string.IsNullOrWhiteSpace(text))
+        if (!ModelState.IsValid)
         {
-            _logger.LogWarning("Text is required.");
-            return BadRequest(new ProblemDetails
-            {
-                Title = "Text is required.",
-                Status = StatusCodes.Status400BadRequest
-            });
+            _logger.LogWarning("Invalid model state: {errors}", ModelState);
+            return BadRequest(ModelState);
         }
+
+        _logger.LogInformation("Summarizing text: {text}", request.Text);
+
         try
         {
-            var summary = await _summarizationService.SummarizeText(text);
+            var summary = await _summaryService.GetTextSummaryAsync(request.Text);
             _logger.LogInformation("Summary: {summary}", summary);
             return Ok(new SuccessDetails
             {
@@ -39,7 +37,7 @@ public class SummarizeController(SummarizationService summarizationService, ILog
                     Type = "article",
                     Extensions = new Dictionary<string, object>
                     {
-                        { "input_text", text },
+                        { "input_text", request.Text },
                         { "summary_text", summary }
                     }
                 }
@@ -47,7 +45,7 @@ public class SummarizeController(SummarizationService summarizationService, ILog
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error summarizing text: {text}", text);
+            _logger.LogError(ex, "Error summarizing text: {text}", request.Text);
             return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
             {
                 Title = "Error summarizing text.",
@@ -61,21 +59,19 @@ public class SummarizeController(SummarizationService summarizationService, ILog
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<SuccessDetails>> SummarizeArticle([FromBody] string url)
+    public async Task<ActionResult<SuccessDetails>> SummarizeArticle([FromBody] ArticleSummaryRequest request)
     {
-        _logger.LogInformation("Summarizing article: {url}", url);
-        if (string.IsNullOrWhiteSpace(url))
+        if (!ModelState.IsValid)
         {
-            _logger.LogWarning("URL is required.");
-            return BadRequest(new ProblemDetails
-            {
-                Title = "URL is required.",
-                Status = StatusCodes.Status400BadRequest
-            });
+            _logger.LogWarning("Invalid model state: {errors}", ModelState);
+            return BadRequest(ModelState);
         }
+
+        _logger.LogInformation("Summarizing article: {url}", request.Url);
+
         try
         {
-            var summary = await _summarizationService.SummarizeArticle(url);
+            var summary = await _summaryService.GetArticleSummaryAsync(request.Url);
             _logger.LogInformation("Summary: {summary}", summary);
             return Ok(new SuccessDetails
             {
@@ -84,7 +80,7 @@ public class SummarizeController(SummarizationService summarizationService, ILog
                     Type = "article",
                     Extensions = new Dictionary<string, object>
                     {
-                        { "input_url", url },
+                        { "input_url", request.Url },
                         { "summary_text", summary }
                     }
                 }
@@ -93,7 +89,7 @@ public class SummarizeController(SummarizationService summarizationService, ILog
 
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error summarizing article: {url}", url);
+            _logger.LogError(ex, "Error summarizing article: {url}", request.Url);
             return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
             {
                 Title = "Error summarizing article.",
