@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Identity;
 
 namespace server.Models;
 
@@ -13,10 +14,4 @@ public class User : IdentityUser
     public int DailyRequestCount { get; set; } = 0;
 
     public DateTime LastRequestAt { get; set; } = DateTime.UtcNow;
-}
-
-public enum SubscriptionTier
-{
-    Free,
-    Premium
 }

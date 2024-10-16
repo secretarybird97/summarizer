@@ -11,19 +11,14 @@ public class Summary
     public string Title { get; set; } = string.Empty;
 
     [Required]
-    public string InputText { get; set; } = string.Empty;
+    public string Input { get; set; } = string.Empty;
 
     [Required]
-    public string Text { get; set; } = string.Empty;
+    public string Output { get; set; } = string.Empty;
 
     [Required]
     public SummaryType Type { get; set; }
 
+    [Url]
     public string? Url { get; set; }
-}
-
-public enum SummaryType
-{
-    Text,
-    Article
 }
