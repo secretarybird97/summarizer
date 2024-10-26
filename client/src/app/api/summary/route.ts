@@ -5,19 +5,18 @@ export async function POST(request: NextRequest) {
 
   try {
     const backendUrl = process.env.BACKEND_URL;
-    console.log(`${backendUrl}/ArticleSummary`);
-    const data = await fetch(`${backendUrl}/ArticleSummary`, {
+    const response = await fetch(`${backendUrl}/ArticleSummary`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(url),
     });
-    if (!data.ok) {
-      throw new Error("Failed to get article summary");
+    if (!response.ok) {
+      throw new Error("Failed to summarize article");
     }
 
-    const summary = await data.json();
+    const summary = await response.json();
     return NextResponse.json(summary, { status: 200 });
   } catch (error) {
     return NextResponse.json(
