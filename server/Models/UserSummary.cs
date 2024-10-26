@@ -10,12 +10,15 @@ public class UserSummary
     [Required]
     public string UserId { get; set; } = null!;
 
+    [Required]
     public User User { get; set; } = null!;
 
     [Required]
     public string SummaryId { get; set; } = null!;
 
+    [Required]
     public Summary Summary { get; set; } = null!;
 
+    [Required]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }
