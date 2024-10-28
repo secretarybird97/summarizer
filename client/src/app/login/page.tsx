@@ -29,13 +29,31 @@ export default function Page() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+  async function handleLogin(values: z.infer<typeof formSchema>) {
+    try {
+      const response = await fetch("/api/login", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to login");
+      }
+
+      console.log("Logged in");
+      window.location.href = "/";
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(handleLogin)} className="space-y-8">
         <FormField
           control={form.control}
           name="email"
