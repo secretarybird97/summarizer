@@ -44,13 +44,13 @@ export default function Summarizer() {
         throw new Error("Failed to summarize");
       }
 
-      const result = await response.json(); // Assuming the result is in JSON
-      setSummary(result.summary); // Set the summary
+      const result = await response.json();
+      setSummary(result.data.summary_text);
     } catch (error) {
       console.log(error);
-      setSummary("Failed to generate summary"); // Show error message
+      setSummary("Failed to generate summary");
     } finally {
-      setLoading(false); // Stop loading
+      setLoading(false);
     }
   }
 

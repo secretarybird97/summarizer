@@ -1,17 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
-  const { url } = await request.json();
+  const { input } = await request.json();
 
   try {
     const backendUrl = process.env.BACKEND_URL;
-    const response = await fetch(`${backendUrl}/ArticleSummary`, {
+    const response = await fetch(`${backendUrl}/Summarize/article`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(url),
+      body: JSON.stringify({ url: input }),
     });
+    console.log(response);
     if (!response.ok) {
       throw new Error("Failed to summarize article");
     }
