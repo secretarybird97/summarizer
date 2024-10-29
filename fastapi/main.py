@@ -1,8 +1,8 @@
 import logging
 
-import httpx
 import torch
 from bs4 import BeautifulSoup
+from playwright.async_api import async_playwright
 from transformers import pipeline
 
 from fastapi import Body, FastAPI, HTTPException
@@ -23,27 +23,69 @@ async def text_summary(text: str):
 
 
 async def fetch_article_content(url: str):
-    headers = {"User-Agent": "Mozilla/5.0"}
-    async with httpx.AsyncClient() as client:
-        response = await client.get(url, headers=headers)
-        if response.status_code != 200:
-            logger.error(
-                f"Failed to fetch the article with status code: {response.status_code}"
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(
+            headless=True, args=["--no-sandbox", "--disable-setuid-sandbox"]
+        )
+        page = await browser.new_page()
+        try:
+            await page.route(
+                "**/*",
+                lambda route: (
+                    route.abort()
+                    if route.request.resource_type in ["image", "stylesheet", "font"]
+                    else route.continue_()
+                ),
             )
-            raise HTTPException(status_code=400, detail="Failed to fetch the article")
 
-    soup = BeautifulSoup(response.content, "html.parser")
-    for selector in ["article", ".post-content", "#main-content"]:
-        content = soup.select_one(selector)
-        if content:
-            paragraphs = content.find_all("p")
-            article_text = " ".join(
-                p.get_text().strip() for p in paragraphs if p.get_text().strip()
+            await page.goto(url, wait_until="domcontentloaded")
+            # await page.wait_for_selector("body", timeout=10000)
+
+            content = await page.content()
+            soup = BeautifulSoup(content, "html.parser")
+
+            selectors = [
+                "article",
+                ".post-content",
+                "#main-content",
+                ".entry-content",
+                ".content-area",
+            ]
+
+            for selector in selectors:
+                article_content = soup.select_one(selector)
+                if article_content:
+                    paragraphs = article_content.find_all("p")
+                    article_text = " ".join(
+                        p.get_text().strip() for p in paragraphs if p.get_text().strip()
+                    )
+                    if article_text:
+                        return article_text
+
+            article_content = soup.find("div", class_="article-body") or soup.find(
+                "div", class_="content"
             )
-            if article_text:
-                return article_text
-    logger.error("Article content not found")
-    return None
+
+            if article_content and not isinstance(article_content, str):
+                paragraphs = article_content.find_all(["p", "div"])
+                article_text = " ".join(
+                    p.get_text().strip() for p in paragraphs if p.get_text().strip()
+                )
+                if article_text:
+                    return article_text
+
+            logger.warning("Using fallback extraction of visible text")
+            visible_text = soup.get_text(separator=" ", strip=True)
+            if visible_text:
+                return visible_text
+
+            logger.error("Article content not found")
+            return None
+        except Exception as e:
+            logger.error(f"Error fetching article: {e}")
+            raise HTTPException(status_code=400, detail="Failed to fetch the article")
+        finally:
+            await browser.close()
 
 
 app = FastAPI()

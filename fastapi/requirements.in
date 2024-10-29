@@ -6,4 +6,4 @@ fastapi
 transformers
 uvicorn
 beautifulsoup4
-httpx
+playwright
