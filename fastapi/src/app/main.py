@@ -1,7 +1,9 @@
 import logging
+from typing import Optional
 
 import torch
 from bs4 import BeautifulSoup
+from models.summary_response import SummaryResponse
 from playwright.async_api import async_playwright
 from transformers import pipeline
 
@@ -14,7 +16,7 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 summarizer = pipeline("summarization", model="facebook/bart-large-cnn", device=DEVICE)
 
 
-async def text_summary(text: str):
+async def text_summary(text: str) -> str:
     try:
         return summarizer(text, max_length=100, min_length=5, do_sample=False)[0]["summary_text"]  # type: ignore
     except Exception as e:
@@ -22,7 +24,7 @@ async def text_summary(text: str):
         raise HTTPException(status_code=500, detail="Error during text summarization")
 
 
-async def fetch_article_content(url: str):
+async def fetch_article_content(url: str) -> Optional[str]:
     async with async_playwright() as p:
         browser = await p.chromium.launch(
             headless=True, args=["--no-sandbox", "--disable-setuid-sandbox"]
@@ -94,7 +96,7 @@ app = FastAPI()
 @app.post("/summarize/text")
 async def summarize_text(text: str = Body(...)):
     summary = await text_summary(text)
-    return {"summary_text": summary}
+    return SummaryResponse(summary_text=summary)
 
 
 @app.post("/summarize/article")
@@ -105,4 +107,4 @@ async def summarize_article(url: str = Body(...)):
             status_code=404, detail="Failed to fetch the article content"
         )
     summary = await text_summary(article_text)
-    return {"summary_text": summary}
+    return SummaryResponse(summary_text=summary)

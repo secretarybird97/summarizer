@@ -2,8 +2,7 @@
 torch
 
 --extra-index-url https://pypi.org/simple
-fastapi
+fastapi[standard]
 transformers
-uvicorn
 beautifulsoup4
 playwright

@@ -10,9 +10,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Button } from "./ui/button";
-import { Skeleton } from "./ui/skeleton";
-import { Textarea } from "./ui/textarea";
+import Typewriter from "../common/typewriter";
+import { Button } from "../ui/button";
+import { Skeleton } from "../ui/skeleton";
+import { Textarea } from "../ui/textarea";
 
 const FormSchema = z.object({
   input: z.string(),
@@ -27,8 +28,8 @@ export default function Summarizer() {
   });
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
-    setLoading(true); // Start loading
-    setSummary(null); // Reset summary
+    setLoading(true);
+    setSummary(null);
 
     try {
       const response = await fetch("/api/summary", {
@@ -87,8 +88,7 @@ export default function Summarizer() {
       {/* Display the summary result */}
       {summary && !loading && (
         <div className="mt-4">
-          <h2 className="font-bold">Summary:</h2>
-          <p>{summary}</p>
+          <Typewriter text={summary} delay={50} />
         </div>
       )}
     </Form>

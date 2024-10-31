@@ -1,5 +1,5 @@
-import SiteHeader from "@/components/siteHeader";
-import Summarizer from "@/components/summarizer";
+import Summarizer from "@/components/features/summarizer";
+import SiteHeader from "@/components/layout/siteHeader";
 
 export default function Home() {
   return (
