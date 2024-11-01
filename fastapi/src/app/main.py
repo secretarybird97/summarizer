@@ -12,11 +12,7 @@ logger = logging.getLogger(__name__)
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 summarizer = pipeline(
-    "summarization",
-    model="facebook/bart-large-cnn",
-    device=device,
-    framework="pt",
-    clean_up_tokenization_spaces=True,
+    "summarization", model="facebook/bart-large-cnn", device=device, framework="pt"
 )
 
 summary_service = SummaryService(summarizer, logger)
