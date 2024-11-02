@@ -1,5 +1,6 @@
 "use client";
 
+import SiteHeader from "@/components/layout/siteHeader";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -52,6 +53,8 @@ export default function Page() {
   }
 
   return (
+    <>
+    <SiteHeader />
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleLogin)} className="space-y-8">
         <FormField
@@ -68,8 +71,7 @@ export default function Page() {
               </FormDescription>
               <FormMessage />
             </FormItem>
-          )}
-        />
+          )} />
         <FormField
           control={form.control}
           name="password"
@@ -84,10 +86,9 @@ export default function Page() {
               </FormDescription>
               <FormMessage />
             </FormItem>
-          )}
-        />
+          )} />
         <Button type="submit">Submit</Button>
       </form>
-    </Form>
+    </Form></>
   );
 }
