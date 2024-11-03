@@ -1,5 +1,6 @@
 "use client";
 
+import Footer from '@/components/layout/footer';
 import { useState } from 'react';
 
 export default function Page() {
@@ -50,6 +51,7 @@ export default function Page() {
                     </div>
                 )}
             </main>
+            <Footer />
         </div>
     );
 }

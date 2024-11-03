@@ -4,7 +4,7 @@ export default function MainNav() {
   return (
     <nav className="flex items-center justify-between w-full p-4">
       {/* Title on the left */}
-      <div className="text-lg font-bold font-serif">
+      <div className="text-lg font-bold font-serif text-NavText text-4xl	">
         <a href="/">Summarizer.</a>
       </div>
 
