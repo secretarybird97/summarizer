@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
-  const { email, password } = await request.json();
+  const { email} = await request.json();
 
   try {
     const backendUrl = process.env.BACKEND_URL;
@@ -11,21 +11,10 @@ export async function POST(request: NextRequest) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email }),
     });
     if (!response.ok) {
-      throw new Error("Failed to login");
-    }
-
-    const cookies = response.headers.get("set-cookie");
-
-    if (cookies) {
-      return NextResponse.json(
-        { status: 200 },
-        { headers: { "set-cookie": cookies } }
-      );
-    } else {
-      throw new Error("Failed to set cookies");
+      throw new Error("Invalid email");
     }
   } catch (error) {
     return NextResponse.json(

@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!response.ok) {
-      throw new Error("Failed to login");
+      throw new Error("Failed to register");
     }
 
     return NextResponse.json({ status: 200 });

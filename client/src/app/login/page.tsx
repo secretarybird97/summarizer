@@ -92,12 +92,12 @@ export default function Page() {
         <Button className="w-full h-full align-bottom rounded-none font-bold leading-loose bg-intButton hover:bg-rose-500" type="submit">Log in</Button>
       </form>
     </Form>
-    <div className="grid grid-cols-2 ">
-      <Button variant="link">
+    <div className="grid grid-cols-2">
+      <Button variant="link" className="w-full">
         <a href="/register">Don't have an account?</a>
       </Button>
-      <Button variant="link">
-      <a href="/recover">Forgot your password?</a>
+      <Button variant="link" className="w-full">
+        <a href="/recover">Forgot your password?</a>
       </Button>
     </div>
     
