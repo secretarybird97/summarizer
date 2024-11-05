@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using Microsoft.EntityFrameworkCore;
 using server.Data;
 using server.Models;
 
@@ -9,28 +8,43 @@ public class UserAccessService(SummarizerDbContext dbContext)
 {
     private readonly SummarizerDbContext _dbContext = dbContext;
 
-    public async Task<bool> CanSummarizeAsync([NotNull] User user)
+    public bool CanSummarize([NotNull] User user)
     {
         if (user.SubscriptionTier == SubscriptionTier.Premium)
         {
             return true;
         }
 
+        if (user.LastRequestAt.Date != DateTime.UtcNow.Date)
+        {
+            user.DailyRequestCount = 0;
+            user.LastRequestAt = DateTime.UtcNow;
+
+            _dbContext.Users.Update(user);
+        }
+
         if (user.DailyRequestCount >= 5 && user.LastRequestAt.Date == DateTime.UtcNow.Date)
         {
-            return false; // Reached daily limit
+            return false;
         }
 
-        // Check if they have more than 10 summaries in history
-        var summaryCount = await _dbContext.UserSummaries
-            .CountAsync(us => us.UserId == user.Id);
+        return true;
+    }
 
-        if (summaryCount >= 10)
+    public bool CanSummarize([NotNull] GuestSummary guestSummary)
+    {
+        if (guestSummary.Date.Date != DateTime.UtcNow.Date)
         {
-            return false; // Exceeded history limit
+            guestSummary.RequestCount = 0;
+            guestSummary.Date = DateTime.UtcNow;
+
+            _dbContext.GuestSummaries.Update(guestSummary);
         }
 
-        // await _dbContext.SaveChangesAsync();
+        if (guestSummary.RequestCount >= 5 && guestSummary.Date.Date == DateTime.UtcNow.Date)
+        {
+            return false;
+        }
 
         return true;
     }

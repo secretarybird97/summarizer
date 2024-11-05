@@ -32,14 +32,27 @@ export default function Summarizer() {
     setSummary(null);
 
     try {
+      const ipResponse = await fetch("https://api.ipify.org?format=json");
+      const ipData = await ipResponse.json();
+      const ipAddress = ipData.ip;
+
+      const requestData = {
+        ...data,
+        ip_address: ipAddress,
+      };
+
       const response = await fetch("/api/summary", {
         method: "POST",
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(requestData),
       });
+
+      if (response.status === 429) {
+        throw new Error("Too many requests, please try again later");
+      }
 
       if (!response.ok) {
         throw new Error("Failed to summarize");
@@ -48,8 +61,8 @@ export default function Summarizer() {
       const result = await response.json();
       setSummary(result.data.summary_text);
     } catch (error) {
-      console.log(error);
-      setSummary("Failed to generate summary");
+      const message = (error as Error).message;
+      setSummary(message);
     } finally {
       setLoading(false);
     }

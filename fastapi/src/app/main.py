@@ -1,11 +1,21 @@
 import logging
 
 import torch
-from app.summary_service import SummaryService
-from models.summary_response import SummaryResponse
+from pydantic import BaseModel
 from transformers import pipeline
+from utils.summary_service import SummaryService
 
 from fastapi import Body, FastAPI, HTTPException
+
+
+class TextSummaryResponse(BaseModel):
+    summary_text: str
+
+
+class ArticleSummaryResponse(BaseModel):
+    article_text: str
+    summary_text: str
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -23,7 +33,7 @@ app = FastAPI()
 @app.post("/summarize/text")
 async def summarize_text(text: str = Body(...)):
     summary = await summary_service.text_summary(text)
-    return SummaryResponse(summary_text=summary)
+    return TextSummaryResponse(summary_text=summary)
 
 
 @app.post("/summarize/article")
@@ -34,4 +44,4 @@ async def summarize_article(url: str = Body(...)):
             status_code=404, detail="Failed to fetch the article content"
         )
     summary = await summary_service.text_summary(article_text)
-    return SummaryResponse(summary_text=summary)
+    return ArticleSummaryResponse(article_text=article_text, summary_text=summary)

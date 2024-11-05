@@ -1,27 +1,47 @@
 ﻿using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using StackExchange.Redis;
 
 namespace server.Services;
 
-public class SummaryService(HttpClient httpClient)
+public class SummaryService(HttpClient httpClient, IConnectionMultiplexer redis)
 {
     private readonly HttpClient _httpClient = httpClient;
     private readonly string _apiUrl = Environment.GetEnvironmentVariable("LLM_API_URL") ?? throw new ArgumentNullException("LLM_API_URL environment variable not set.");
+    private readonly IDatabase _cache = redis.GetDatabase();
 
-    public async Task<string> GetArticleSummaryAsync(string url)
+    public async Task<ArticleSummaryResponse> GetArticleSummaryAsync(string url)
     {
-        // TODO: Implement Redis cache
-        return await SummarizeArticleViaFastApi(url);
+        string cacheKey = GenerateCacheKey(url);
+        var cachedSummary = await _cache.StringGetAsync(cacheKey);
+
+        if (!cachedSummary.IsNullOrEmpty)
+        {
+            return JsonSerializer.Deserialize<ArticleSummaryResponse>(cachedSummary!)!;
+        }
+
+        var summary = await SummarizeArticleViaFastApi(url);
+        await _cache.StringSetAsync(cacheKey, JsonSerializer.Serialize(summary), TimeSpan.FromHours(24));
+        return summary;
     }
 
-    public async Task<string> GetTextSummaryAsync(string text)
+    public async Task<TextSummaryResponse> GetTextSummaryAsync(string text)
     {
-        // TODO: Implement Redis cache
-        return await SummarizeTextViaFastApi(text);
+        string cacheKey = GenerateCacheKey(text);
+        var cachedSummary = await _cache.StringGetAsync(cacheKey);
+
+        if (!cachedSummary.IsNullOrEmpty)
+        {
+            return JsonSerializer.Deserialize<TextSummaryResponse>(cachedSummary!)!;
+        }
+
+        var summary = await SummarizeTextViaFastApi(text);
+        await _cache.StringSetAsync(cacheKey, JsonSerializer.Serialize(summary), TimeSpan.FromHours(1));
+        return summary;
     }
 
-    private async Task<string> SummarizeTextViaFastApi(string text)
+    private async Task<TextSummaryResponse> SummarizeTextViaFastApi(string text)
     {
         try
         {
@@ -29,8 +49,8 @@ public class SummaryService(HttpClient httpClient)
             var response = await _httpClient.PostAsync($"{_apiUrl}/summarize/text", body);
             response.EnsureSuccessStatusCode();
 
-            var responseObject = JsonSerializer.Deserialize<SummaryResponse>(await response.Content.ReadAsStringAsync());
-            return responseObject?.SummaryText ?? string.Empty;
+            var responseObject = JsonSerializer.Deserialize<TextSummaryResponse>(await response.Content.ReadAsStringAsync());
+            return responseObject ?? throw new InvalidOperationException("Response object is null.");
         }
         catch (HttpRequestException ex)
         {
@@ -40,7 +60,7 @@ public class SummaryService(HttpClient httpClient)
 
     }
 
-    private async Task<string> SummarizeArticleViaFastApi(string url)
+    private async Task<ArticleSummaryResponse> SummarizeArticleViaFastApi(string url)
     {
         try
         {
@@ -48,8 +68,8 @@ public class SummaryService(HttpClient httpClient)
             var response = await _httpClient.PostAsync($"{_apiUrl}/summarize/article", body);
             response.EnsureSuccessStatusCode();
 
-            var responseObject = JsonSerializer.Deserialize<SummaryResponse>(await response.Content.ReadAsStringAsync());
-            return responseObject?.SummaryText ?? string.Empty;
+            var responseObject = JsonSerializer.Deserialize<ArticleSummaryResponse>(await response.Content.ReadAsStringAsync());
+            return responseObject ?? throw new InvalidOperationException("Response object is null.");
         }
         catch (HttpRequestException ex)
         {
@@ -59,13 +79,22 @@ public class SummaryService(HttpClient httpClient)
 
     }
 
-    private string GenerateCacheKey(string text)
+    private static string GenerateCacheKey(string input)
     {
-        return $"summary:{text.GetHashCode()}";
+        return $"summary:{input.GetHashCode()}";
     }
 
-    private class SummaryResponse
+    public class TextSummaryResponse
     {
+        [JsonPropertyName("summary_text")]
+        public string SummaryText { get; set; } = string.Empty;
+    }
+
+    public class ArticleSummaryResponse
+    {
+        [JsonPropertyName("article_text")]
+        public string ArticleText { get; set; } = string.Empty;
+
         [JsonPropertyName("summary_text")]
         public string SummaryText { get; set; } = string.Empty;
     }
