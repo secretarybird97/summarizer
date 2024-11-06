@@ -8,6 +8,7 @@ public class SummarizerDbContext(DbContextOptions<SummarizerDbContext> options) 
 {
     public DbSet<Summary> Summaries { get; set; }
     public DbSet<UserSummary> UserSummaries { get; set; }
+    public DbSet<GuestSummary> GuestSummaries { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
