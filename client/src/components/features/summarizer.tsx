@@ -5,6 +5,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormMessage,
 } from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
@@ -69,16 +70,17 @@ export default function Summarizer() {
               <FormLabel>Input</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="Insert text for summary"
+                  placeholder="Insert URL or text for summary"
                   className="resize-none"
                   {...field}
                 />
               </FormControl>
+              <FormMessage />
             </FormItem>
           )}
         />
-        <Button type="submit" disabled={loading}>
-          {loading ? "Summarizing..." : "Submit"}
+        <Button className="w-full h-full align-bottom rounded-none font-bold leading-loose bg-intButton hover:bg-rose-500" type="submit" disabled={loading}>
+          {loading ? "Summarizing..." : "Generate summary"}
         </Button>
       </form>
 

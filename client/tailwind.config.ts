@@ -10,6 +10,9 @@ const config: Config = {
   theme: {
   	extend: {
   		colors: {
+			'intButton': '#ee9bb4',
+			'cardsBG': '#20161f',
+			'NavText': '#ffce7c',
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
   			card: {
