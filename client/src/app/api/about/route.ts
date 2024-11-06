@@ -5,19 +5,18 @@ export async function POST(request: NextRequest) {
 
   try {
     const backendUrl = process.env.BACKEND_URL;
-    const response = await fetch(`${backendUrl}/register`, {
+    const response = await fetch(`${backendUrl}/about`, {
       method: "POST",
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ }),
     });
-
     if (!response.ok) {
-      throw new Error("Failed to register");
+      throw new Error("Failed to load");
     }
-
-    return NextResponse.json({ status: 200 });
+    
   } catch (error) {
     return NextResponse.json(
       { error: (error as Error).message },

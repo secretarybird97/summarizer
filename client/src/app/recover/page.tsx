@@ -60,7 +60,7 @@ export default function Page() {
     <main className="grid items-center justify-items-center min-h-screen pb-20 font-[family-name:var(--font-geist-sans)]">
     <Card className="bg-cardsBG w-3/12 h-min border-NavText">
     <CardHeader>
-        <CardTitle className="text-NavText font-bold">Welcome Back!</CardTitle>
+        <CardTitle className="text-NavText font-bold">Recover your password</CardTitle>
     </CardHeader>
     <CardContent>
     <Form {...form}>
@@ -77,30 +77,14 @@ export default function Page() {
               <FormMessage />
             </FormItem>
           )} />
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-white font-bold">Password</FormLabel>
-              <FormControl >
-                <Input className="text-white" type="password" placeholder="Enter your password" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )} />
-        <Button className="w-full h-full align-bottom rounded-none font-bold leading-loose bg-intButton hover:bg-rose-500" type="submit">Log in</Button>
+        <Button className="w-full h-full align-bottom rounded-none font-bold leading-loose bg-intButton hover:bg-rose-500" type="submit">Send recovery mail</Button>
       </form>
     </Form>
     <div className="grid grid-cols-2">
-      <Button variant="link" className="w-full">
-        <a href="/register">Don't have an account?</a>
-      </Button>
-      <Button variant="link" className="w-full">
-        <a href="/recover">Forgot your password?</a>
+      <Button variant="link">
+        <a  href="/login">Back to login screen</a>
       </Button>
     </div>
-    
     </CardContent>
     </Card>
     </main>
