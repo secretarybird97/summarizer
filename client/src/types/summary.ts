@@ -1,6 +1,5 @@
 export interface Summary {
-  id: string;
-  title: string;
-  content: string;
-  createdAt: string;
+  type: string;
+  input_text: string;
+  summary_text: string;
 }

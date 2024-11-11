@@ -9,12 +9,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { formatDate } from "@/lib/utils";
-import { Summary } from "@/types/summary";
+import { UserSummary } from "@/types/user_summary";
 import { Trash2Icon } from "lucide-react";
 import { ScrollArea } from "../ui/scrollarea";
 
 interface UserSummariesProps {
-  summaries: Summary[];
+  summaries: UserSummary[];
 }
 
 // TODO: Implement delete functionality

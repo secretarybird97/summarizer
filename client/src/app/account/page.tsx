@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Summary } from "@/types/summary";
+import { UserSummary } from "@/types/user_summary";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
@@ -35,7 +35,7 @@ async function fetchSummaries() {
 
   const summaries = await response.json();
 
-  const mappedSummaries = summaries.map((summary: Summary) => {
+  const mappedSummaries = summaries.map((summary: UserSummary) => {
     return {
       title: summary.title,
       content: summary.content,

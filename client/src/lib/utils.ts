@@ -12,3 +12,13 @@ export function formatDate(dateString: string) {
   const year = date.getFullYear();
   return `${month}/${day}/${year}`;
 }
+
+export function isValidUrl(input: string){
+  try {
+    new URL(input);
+    return true;
+  }
+  catch {
+    return false;
+  }
+}

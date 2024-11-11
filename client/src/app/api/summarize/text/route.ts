@@ -1,3 +1,4 @@
+import { Summary } from "@/types/summary";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -18,7 +19,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const backendUrl = process.env.BACKEND_URL;
-    const response = await fetch(`${backendUrl}/Summarize/article`, {
+    const response = await fetch(`${backendUrl}/Summarize/text`, {
       method: "POST",
       credentials: "include",
       headers: {
@@ -39,7 +40,7 @@ export async function POST(request: NextRequest) {
       throw new Error("Failed to summarize article");
     }
 
-    const summary = await response.json();
+    const summary: Summary = await response.json();
     const responseHeaders = new Headers();
     response.headers.forEach((value, key) => {
       if (key.toLowerCase() === "set-cookie") {
