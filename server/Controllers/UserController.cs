@@ -10,23 +10,35 @@ namespace server.Controllers;
 [ApiController]
 [Route("[controller]")]
 [Produces("application/json")]
-[Authorize]
 public class UserController(ILogger<UserController> logger, SummarizerDbContext dbContext, SignInManager<User> signInManager) : BaseController<UserController>(logger, dbContext)
 {
     private readonly SignInManager<User> _signInManager = signInManager;
 
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [HttpGet("info", Name = "GetUserInfo")]
-    public IActionResult GetUserInfo()
+    public async Task<ActionResult<UserInfoResponse>> GetUserInfo()
     {
-        var username = User.Identity?.Name;
-        return Ok(new { username });
+        var user = await GetAuthenticatedUserAsync();
+
+        if (user == null) return Unauthorized();
+
+        return Ok(new UserInfoResponse
+        {
+            Username = user.UserName ?? "",
+            CreatedAt = user.CreatedAt,
+            SubscriptionTier = user.SubscriptionTier,
+            DailyRequestCount = user.DailyRequestCount,
+            LastRequestAt = user.LastRequestAt
+        });
     }
 
+    [AllowAnonymous]
     [HttpPost("logout", Name = "Logout")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ActionResult> Logout()
+    public async Task<IActionResult> Logout()
     {
         _logger.LogInformation("Logging out user: {username}", User.Identity?.Name);
 
@@ -34,6 +46,7 @@ public class UserController(ILogger<UserController> logger, SummarizerDbContext 
         return Ok();
     }
 
+    [Authorize]
     [HttpGet("summaries", Name = "GetUserSummaries")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -58,6 +71,7 @@ public class UserController(ILogger<UserController> logger, SummarizerDbContext 
         return Ok(userSummaries);
     }
 
+    [Authorize]
     [HttpDelete("summaries/{id}", Name = "DeleteUserSummary")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -82,6 +96,33 @@ public class UserController(ILogger<UserController> logger, SummarizerDbContext 
 
         return Ok();
     }
+
+    [Authorize]
+    [HttpPut("subscription", Name = "ChangeSubscriptionTier")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> ChangeSubscriptionTier([FromBody] ChangeSubcriptionRequest request)
+    {
+        var user = await GetAuthenticatedUserAsync();
+        if (user == null)
+        {
+            return Unauthorized();
+        }
+
+        if (!Enum.IsDefined(typeof(SubscriptionTier), request.NewSubscriptionTier))
+        {
+            return BadRequest("Invalid subscription tier specified.");
+        }
+
+        user.SubscriptionTier = request.NewSubscriptionTier;
+        _dbContext.Users.Update(user);
+        await _dbContext.SaveChangesAsync();
+
+        _logger.LogInformation("User {username} changed their subscription tier to {tier}", user.UserName, user.SubscriptionTier);
+
+        return Ok(new { message = "Subscription tier updated successfully." });
+    }
 }
 
 public class SummaryResponse()
@@ -90,4 +131,22 @@ public class SummaryResponse()
     public string Title { get; set; } = null!;
     public string Content { get; set; } = null!;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+}
+
+public class ChangeSubcriptionRequest()
+{
+    public SubscriptionTier NewSubscriptionTier { get; set; }
+}
+
+public class UserInfoResponse()
+{
+    public DateTime CreatedAt { get; set; }
+
+    public SubscriptionTier SubscriptionTier { get; set; }
+
+    public int DailyRequestCount { get; set; }
+
+    public DateTime LastRequestAt { get; set; }
+
+    public string Username { get; set; } = string.Empty;
 }

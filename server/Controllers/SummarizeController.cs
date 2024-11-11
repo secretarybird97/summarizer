@@ -19,7 +19,7 @@ public class SummarizeController(SummarizerDbContext dbContext, SummaryService s
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
-    public async Task<ActionResult<SuccessDetails>> SummarizeText([FromBody] TextSummaryRequest request)
+    public async Task<ActionResult> SummarizeText([FromBody] TextSummaryRequest request)
     {
         if (!ModelState.IsValid)
         {
@@ -69,14 +69,7 @@ public class SummarizeController(SummarizerDbContext dbContext, SummaryService s
                 }
             }
 
-            return Ok(new SuccessDetails
-            {
-                Data = new DataSchema
-                {
-                    Type = "text",
-                    Extensions = new Dictionary<string, object> { { "input_text", request.Text }, { "summary_text", summary.SummaryText } }
-                }
-            });
+            return Ok(new { type = "text", input_text = request.Text, summary_text = summary.SummaryText });
         }
         catch (Exception ex)
         {
@@ -99,7 +92,7 @@ public class SummarizeController(SummarizerDbContext dbContext, SummaryService s
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
-    public async Task<ActionResult<SuccessDetails>> SummarizeArticle([FromBody] ArticleSummaryRequest request)
+    public async Task<ActionResult> SummarizeArticle([FromBody] ArticleSummaryRequest request)
     {
         if (!ModelState.IsValid)
         {
@@ -149,14 +142,7 @@ public class SummarizeController(SummarizerDbContext dbContext, SummaryService s
                 }
             }
 
-            return Ok(new SuccessDetails
-            {
-                Data = new DataSchema
-                {
-                    Type = "article",
-                    Extensions = new Dictionary<string, object> { { "input_text", summary.ArticleText }, { "summary_text", summary.SummaryText }, { "url", request.Url }, { "title", summary.Title } }
-                }
-            });
+            return Ok(new { type = "article", input_text = summary.ArticleText, summary_text = summary.SummaryText });
         }
         catch (Exception ex)
         {
