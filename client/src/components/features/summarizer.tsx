@@ -25,7 +25,7 @@ const FormSchema = z.object({
 });
 
 export default function Summarizer() {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const [summary, setSummary] = useState<string | null>(null);
 
   const form = useForm<z.infer<typeof FormSchema>>({
