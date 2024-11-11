@@ -1,5 +1,5 @@
 from logging import Logger
-from typing import Optional
+from typing import Dict, Optional
 
 from bs4 import BeautifulSoup
 from playwright.async_api import async_playwright
@@ -22,7 +22,9 @@ class SummaryService:
                 status_code=500, detail="Error during text summarization"
             )
 
-    async def fetch_article_content(self, url: str) -> Optional[str]:
+    async def fetch_article_content(
+        self, url: str
+    ) -> Optional[Dict[str, Optional[str]]]:
         async with async_playwright() as p:
             browser = await p.chromium.launch(
                 headless=True, args=["--no-sandbox", "--disable-setuid-sandbox"]
@@ -45,6 +47,11 @@ class SummaryService:
                 content = await page.content()
                 soup = BeautifulSoup(content, "html.parser")
 
+                title = soup.title.string if soup.title else None
+                if not title:
+                    main_heading = soup.find("h1")
+                    title = main_heading.get_text().strip() if main_heading else None
+
                 selectors = [
                     "article",
                     ".post-content",
@@ -53,6 +60,7 @@ class SummaryService:
                     ".content-area",
                 ]
 
+                article_text = None
                 for selector in selectors:
                     article_content = soup.select_one(selector)
                     if article_content:
@@ -63,27 +71,31 @@ class SummaryService:
                             if p.get_text().strip()
                         )
                         if article_text:
-                            return article_text
+                            break
 
-                article_content = soup.find("div", class_="article-body") or soup.find(
-                    "div", class_="content"
-                )
+                if not article_text:
+                    article_content = soup.find(
+                        "div", class_="article-body"
+                    ) or soup.find("div", class_="content")
 
-                if article_content and not isinstance(article_content, str):
-                    paragraphs = article_content.find_all(["p", "div"])
-                    article_text = " ".join(
-                        p.get_text().strip() for p in paragraphs if p.get_text().strip()
-                    )
-                    if article_text:
-                        return article_text
+                    if article_content and not isinstance(article_content, str):
+                        paragraphs = article_content.find_all(["p", "div"])
+                        article_text = " ".join(
+                            p.get_text().strip()
+                            for p in paragraphs
+                            if p.get_text().strip()
+                        )
 
-                self.logger.warning("Using fallback extraction of visible text")
-                visible_text = soup.get_text(separator=" ", strip=True)
-                if visible_text:
-                    return visible_text
+                if not article_text:
+                    self.logger.warning("Using fallback extraction of visible text")
+                    visible_text = soup.get_text(separator=" ", strip=True)
+                    article_text = visible_text if visible_text else None
 
-                self.logger.error("Article content not found")
-                return None
+                if not article_text:
+                    self.logger.error("Article content not found")
+                    return None
+
+                return {"title": title, "article_text": article_text}
             except Exception as e:
                 self.logger.error(f"Error fetching article: {e}")
                 raise HTTPException(

@@ -13,6 +13,7 @@ export async function POST(request: NextRequest) {
       },
       body: JSON.stringify({ email, password }),
     });
+
     if (!response.ok) {
       throw new Error("Failed to login");
     }

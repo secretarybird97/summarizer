@@ -9,17 +9,16 @@ namespace server.Controllers;
 [ApiController]
 [Route("[controller]")]
 [Produces("application/json")]
-public class SummarizeController(SummarizerDbContext dbContext, SummaryService summaryService, UserAccessService userAccessService, ILogger<SummarizeController> logger) : ControllerBase
+public class SummarizeController(SummarizerDbContext dbContext, SummaryService summaryService, UserAccessService userAccessService, ILogger<SummarizeController> logger) : BaseController<SummarizeController>(logger, dbContext)
 {
     private readonly SummaryService _summaryService = summaryService;
-    private readonly ILogger<SummarizeController> _logger = logger;
     private readonly UserAccessService _userAccessService = userAccessService;
-    private readonly SummarizerDbContext _dbContext = dbContext;
 
     [HttpPost("text", Name = "SummarizeText")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
     public async Task<ActionResult<SuccessDetails>> SummarizeText([FromBody] TextSummaryRequest request)
     {
         if (!ModelState.IsValid)
@@ -41,17 +40,33 @@ public class SummarizeController(SummarizerDbContext dbContext, SummaryService s
             });
         }
 
-        await _dbContext.SaveChangesAsync();
-        _logger.LogInformation("Summarizing text: {text}", request.Text);
-
+        _logger.LogInformation($"Summarizing article: {request.Text}");
         try
         {
             var summary = await _summaryService.GetTextSummaryAsync(request.Text);
-            var summaryEntity = CreateSummary(request.Text, summary.SummaryText, SummaryType.Text);
+            var existingSummary = await _dbContext.Summaries
+                .SingleOrDefaultAsync(s => s.Input == request.Text && s.Output == summary.SummaryText && s.Type == SummaryType.Text);
+
+            Summary summaryEntity;
+            if (existingSummary != null)
+            {
+                summaryEntity = existingSummary;
+            }
+            else
+            {
+                summaryEntity = CreateSummary(request.Text, summary.SummaryText, SummaryType.Text);
+                await _dbContext.Summaries.AddAsync(summaryEntity);
+            }
 
             if (user != null)
             {
-                await _dbContext.UserSummaries.AddAsync(new UserSummary { User = user, Summary = summaryEntity });
+                var userSummaryExists = await _dbContext.UserSummaries
+                    .AnyAsync(us => us.UserId == user.Id && us.SummaryId == summaryEntity.Id);
+
+                if (!userSummaryExists)
+                {
+                    await _dbContext.UserSummaries.AddAsync(new UserSummary { User = user, Summary = summaryEntity });
+                }
             }
 
             return Ok(new SuccessDetails
@@ -65,7 +80,7 @@ public class SummarizeController(SummarizerDbContext dbContext, SummaryService s
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error summarizing text: {text}", request.Text);
+            _logger.LogError(ex, $"Error summarizing text: {request.Text}");
             return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
             {
                 Title = "Error summarizing text.",
@@ -73,12 +88,17 @@ public class SummarizeController(SummarizerDbContext dbContext, SummaryService s
                 Status = StatusCodes.Status500InternalServerError
             });
         }
+        finally
+        {
+            await _dbContext.SaveChangesAsync();
+        }
     }
 
     [HttpPost("article", Name = "SummarizeArticle")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
     public async Task<ActionResult<SuccessDetails>> SummarizeArticle([FromBody] ArticleSummaryRequest request)
     {
         if (!ModelState.IsValid)
@@ -100,25 +120,41 @@ public class SummarizeController(SummarizerDbContext dbContext, SummaryService s
             });
         }
 
-        await _dbContext.SaveChangesAsync();
         _logger.LogInformation($"Summarizing article: {request.Url}");
-
         try
         {
             var summary = await _summaryService.GetArticleSummaryAsync(request.Url);
-            var summaryEntity = CreateSummary(summary.ArticleText, summary.SummaryText, SummaryType.Article, url: request.Url);
+            var existingSummary = await _dbContext.Summaries
+                .SingleOrDefaultAsync(s => s.Input == summary.ArticleText && s.Output == summary.SummaryText && s.Type == SummaryType.Article);
+
+            Summary summaryEntity;
+            if (existingSummary != null)
+            {
+                summaryEntity = existingSummary;
+            }
+            else
+            {
+                summaryEntity = CreateSummary(summary.ArticleText, summary.SummaryText, SummaryType.Article, url: request.Url, title: summary.Title);
+                await _dbContext.Summaries.AddAsync(summaryEntity);
+            }
 
             if (user != null)
             {
-                await _dbContext.UserSummaries.AddAsync(new UserSummary { User = user, Summary = summaryEntity });
+                var userSummaryExists = await _dbContext.UserSummaries
+                    .AnyAsync(us => us.UserId == user.Id && us.SummaryId == summaryEntity.Id);
+
+                if (!userSummaryExists)
+                {
+                    await _dbContext.UserSummaries.AddAsync(new UserSummary { User = user, Summary = summaryEntity });
+                }
             }
 
             return Ok(new SuccessDetails
             {
                 Data = new DataSchema
                 {
-                    Type = "text",
-                    Extensions = new Dictionary<string, object> { { "input_text", summary.ArticleText }, { "summary_text", summary.SummaryText } }
+                    Type = "article",
+                    Extensions = new Dictionary<string, object> { { "input_text", summary.ArticleText }, { "summary_text", summary.SummaryText }, { "url", request.Url }, { "title", summary.Title } }
                 }
             });
         }
@@ -132,23 +168,18 @@ public class SummarizeController(SummarizerDbContext dbContext, SummaryService s
                 Status = StatusCodes.Status500InternalServerError
             });
         }
-    }
-
-    private async Task<User?> GetAuthenticatedUserAsync()
-    {
-        if (User.Identity != null && User.Identity.IsAuthenticated)
+        finally
         {
-            return await _dbContext.Users.FirstOrDefaultAsync(u => u.UserName == User.Identity.Name);
+            await _dbContext.SaveChangesAsync();
         }
-        return null;
     }
 
-    private async Task<GuestSummary> HandleGuestRequestAsync(string ipAddress)
+    private async Task<GuestUser> HandleGuestRequestAsync(string ipAddress)
     {
-        var guestSummary = await _dbContext.GuestSummaries.FirstOrDefaultAsync(gs => gs.IpAddress == ipAddress);
+        var guestSummary = await _dbContext.GuestSummaries.SingleOrDefaultAsync(gs => gs.IpAddress == ipAddress);
         if (guestSummary == null)
         {
-            guestSummary = new GuestSummary { IpAddress = ipAddress, RequestCount = 1, Date = DateTime.UtcNow };
+            guestSummary = new GuestUser { IpAddress = ipAddress, RequestCount = 1, Date = DateTime.UtcNow };
             await _dbContext.GuestSummaries.AddAsync(guestSummary);
         }
         else
@@ -159,7 +190,7 @@ public class SummarizeController(SummarizerDbContext dbContext, SummaryService s
         return guestSummary;
     }
 
-    private bool IsRequestLimitExceeded(User? user, GuestSummary? guestSummary, string identifier)
+    private bool IsRequestLimitExceeded(User? user, GuestUser? guestSummary, string identifier)
     {
         if (user != null && !_userAccessService.CanSummarize(user))
         {
@@ -174,12 +205,13 @@ public class SummarizeController(SummarizerDbContext dbContext, SummaryService s
         return false;
     }
 
-    private static Summary CreateSummary(string input, string summaryText, SummaryType type, string url = "")
+    private static Summary CreateSummary(string input, string summaryText, SummaryType type, string url = "", string title = "")
     {
         if (type == SummaryType.Article)
         {
             return new Summary
             {
+                Title = title,
                 Url = url,
                 Input = input,
                 Output = summaryText,
