@@ -10,7 +10,7 @@ export default function PlanCard() {
     <CardHeader>
         <CardTitle className="text-NavText font-bold">Upgrade Plan</CardTitle>
         <CardDescription className="text-white">Upgrade your subscription plan and enjoy enhanced functions.</CardDescription>
-        <CardDescription className="text-white font-bold">$x.xx / Month </CardDescription>
+        <CardDescription className="text-white font-bold">$6.99 / Month </CardDescription>
 
     </CardHeader>
     <CardContent className="text-white">

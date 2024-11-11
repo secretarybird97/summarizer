@@ -56,7 +56,6 @@ export default function Page() {
 
   return (
     <>
-    <SiteHeader />
     <main className="grid items-center justify-items-center min-h-screen pb-20 font-[family-name:var(--font-geist-sans)]">
     <Card className="bg-cardsBG w-3/12 h-min border-NavText">
     <CardHeader>
@@ -88,7 +87,6 @@ export default function Page() {
     </CardContent>
     </Card>
     </main>
-    <Footer />
     </>
   );
 }

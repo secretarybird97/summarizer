@@ -1,23 +1,46 @@
 "use client";
 
 import { useState } from 'react';
-import SiteHeader from "@/components/layout/siteHeader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scrollarea"
-import Footer from '@/components/layout/footer';
 import { Trash2Icon } from 'lucide-react';
-
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuRadioGroup,
+    DropdownMenuRadioItem,
+    DropdownMenuTrigger,
+  } from "../../components/ui/dropdownmenu"
+import React from 'react';
+import { Input } from '@/components/ui/input';
 export default function Page() {
+    
     const [responseData, setResponseData] = useState<string | null>(null);
-
+    const [sortby, setSortby] = React.useState("Most recent")
 
     return (
         <div className="flex min-h-screen flex-col">
-            <SiteHeader />
             <main className="grid grid-cols-2 items-center justify-items-center min-h-screen pb-20 font-[family-name:var(--font-geist-sans)]">
                 <div className="justify-items-center w-full">
                     <h1 className="font-bold text-4xl text-NavText mb-10">Summaries history</h1>
+                    <div className="grid grid-cols-2 w-full mb-4 px-10 justify-between">
+                        <Input className="justify-self-start w-64" placeholder="Search by article name:" />
+                        <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button className="justify-self-end w-40 " variant="outline">Sort by: {sortby} </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="w-40">
+                            <DropdownMenuRadioGroup value={sortby} onValueChange={setSortby}>
+                            <DropdownMenuRadioItem value="Most recent">Most recent</DropdownMenuRadioItem>
+                            <DropdownMenuRadioItem value="Oldest">Oldest</DropdownMenuRadioItem>
+                            </DropdownMenuRadioGroup>
+                        </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
                     <ScrollArea className="h-96 w-11/12 rounded-md border p-6">
                     <Card className="bg-cardsBG w-full h-min border-transparent my-5 ml-0.5">
                         <CardHeader>
@@ -96,7 +119,6 @@ export default function Page() {
                     </CardContent>
                 </Card>
             </main>
-            <Footer />
         </div>
     );
 }

@@ -1,6 +1,5 @@
 "use client";
 
-import SiteHeader from "@/components/layout/siteHeader";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -13,28 +12,38 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm} from "react-hook-form";
+import { useFormState, useFormStatus } from 'react-dom'
+
 import { z } from "zod";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import Footer from "@/components/layout/footer";
 
-const formSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8),
+const SignupFormSchema = z.object({
+  email: z.string().email({ message: 'Please enter a valid email.' }).trim(),
+  password: z
+  .string()
+  .min(8, { message: 'Be at least 8 characters long' })
+  .regex(/[a-zA-Z]/, { message: 'Contain at least one letter.' })
+  .regex(/[0-9]/, { message: 'Contain at least one number.' })
+  .regex(/[^a-zA-Z0-9]/, {
+    message: 'Contain at least one special character.',
+  })
+  .trim(),
 });
+
 
 export default function Page() {
   const form = useForm({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(SignupFormSchema),
     defaultValues: {
       email: "",
       password: "",
     },
   });
 
-  async function handleLogin(values: z.infer<typeof formSchema>) {
+  async function handleRegister(values: z.infer<typeof SignupFormSchema>) {
     try {
-      const response = await fetch("/api/login", {
+      const response = await fetch("/api/register", {
         method: "POST",
         credentials: "include",
         headers: {
@@ -43,20 +52,23 @@ export default function Page() {
         body: JSON.stringify(values),
       });
 
+      console.log(values);
+      console.log(response);
+      
       if (!response.ok) {
-        throw new Error("Failed to login");
+        throw new Error("Failed to register");
       }
 
-      console.log("Logged in");
-      window.location.href = "/";
+      console.log("User successfully registered");
+      window.location.href = "/about";
     } catch (error) {
       console.error(error);
     }
   }
 
+
   return (
-    <>
-    <SiteHeader />
+  <>
     <main className="grid items-center justify-items-center min-h-screen pb-20 font-[family-name:var(--font-geist-sans)]">
     <Card className="bg-cardsBG w-3/12 h-min border-NavText">
     <CardHeader>
@@ -64,7 +76,7 @@ export default function Page() {
     </CardHeader>
     <CardContent>
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleLogin)} className="space-y-8 ">
+      <form onSubmit={form.handleSubmit(handleRegister)} className="space-y-8 ">
         <FormField
           control={form.control}
           name="email"
@@ -89,18 +101,6 @@ export default function Page() {
               <FormMessage />
             </FormItem>
           )} />
-        <FormField
-        control={form.control}
-        name="password"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel className="text-white font-bold">Confirm your password</FormLabel>
-            <FormControl >
-              <Input className="text-white" type="password" placeholder="Confirm your password" {...field} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )} />
         <Button className="w-full h-full align-bottom rounded-none font-bold leading-loose bg-intButton hover:bg-rose-500" type="submit">Sign up</Button>
       </form>
     </Form>
@@ -112,7 +112,6 @@ export default function Page() {
     </CardContent>
     </Card>
     </main>
-    <Footer />
-    </>
+  </>
   );
 }
