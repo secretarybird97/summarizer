@@ -8,18 +8,18 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { formatDate } from "@/lib/utils";
-import { UserSummary } from "@/types/user_summary";
-import { Trash2Icon } from "lucide-react";
-import { useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
-} from "../../components/ui/dropdownmenu";
-import { Input } from "../ui/input";
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import { formatDate } from "@/lib/utils";
+import { UserSummary } from "@/types/user_summary";
+import { Trash2Icon } from "lucide-react";
+import { useEffect, useState } from "react";
 import { ScrollArea } from "../ui/scrollarea";
 
 interface UserSummariesProps {
@@ -29,8 +29,28 @@ interface UserSummariesProps {
 export default function UserSummaries({ summaries }: UserSummariesProps) {
   const [userSummaries, setUserSummaries] = useState<UserSummary[]>(summaries);
   const [sortby, setSortby] = useState<string>("Most recent");
-
   const [searchby, setSearchby] = useState("");
+
+  useEffect(() => {
+    // Filter and sort summaries whenever `searchby`, `sortby`, or `summaries` change.
+    let filteredSummaries = summaries.filter((summary) =>
+      summary.title.toLowerCase().includes(searchby.toLowerCase())
+    );
+
+    if (sortby === "Most recent") {
+      filteredSummaries = filteredSummaries.sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+    } else {
+      filteredSummaries = filteredSummaries.sort(
+        (a, b) =>
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+      );
+    }
+
+    setUserSummaries(filteredSummaries);
+  }, [searchby, sortby, summaries]);
 
   const handleDelete = async (id: string) => {
     try {
@@ -61,31 +81,14 @@ export default function UserSummaries({ summaries }: UserSummariesProps) {
         />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button className="justify-self-end w-40 " variant="outline">
-              Sort by: {sortby}{" "}
+            <Button className="justify-self-end w-40" variant="outline">
+              Sort by: {sortby}
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-40">
             <DropdownMenuRadioGroup
               value={sortby}
-              onValueChange={(sortby: string) => {
-                setSortby(sortby);
-                if (sortby == "Most recent") {
-                  summaries.sort(
-                    (a, b) =>
-                      new Date(a.createdAt).getTime() -
-                      new Date(b.createdAt).getTime()
-                  );
-                  setUserSummaries(summaries);
-                } else {
-                  summaries.sort(
-                    (a, b) =>
-                      new Date(b.createdAt).getTime() -
-                      new Date(a.createdAt).getTime()
-                  );
-                  setUserSummaries(summaries);
-                }
-              }}
+              onValueChange={(newSortby: string) => setSortby(newSortby)}
             >
               <DropdownMenuRadioItem value="Most recent">
                 Most recent
@@ -98,9 +101,9 @@ export default function UserSummaries({ summaries }: UserSummariesProps) {
         </DropdownMenu>
       </div>
       <ScrollArea className="h-96 w-11/12 rounded-md border p-6">
-        {userSummaries.map((summary, index) => (
+        {userSummaries.map((summary) => (
           <Card
-            key={index}
+            key={summary.id}
             className="bg-cardsBG w-full h-min border-transparent my-5"
           >
             <CardHeader>
