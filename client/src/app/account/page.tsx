@@ -4,7 +4,7 @@ import { UserInfo } from "@/types/user_info";
 import { UserSummary } from "@/types/user_summary";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import sampleSummaries from "./sampleSummaries";
+import { sampleSummaries, sampleUserInfo } from "./data";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function fetchSummaries() {
@@ -47,14 +47,8 @@ export default async function Page() {
   //   return NextResponse.redirect("/login");
   // }
   // const data = await response.json();
-  const summaries = sampleSummaries;
-  const userInfo: UserInfo = {
-    createdAt: "2024-11-11T06:57:59.579836Z",
-    subscriptionTier: 0,
-    dailyRequestCount: 0,
-    lastRequestAt: "2024-11-12T04:47:02.232937Z",
-    username: "email@example.com",
-  };
+  const summaries: UserSummary[] = sampleSummaries;
+  const userInfo: UserInfo = sampleUserInfo;
 
   return (
     <div className="flex min-h-screen flex-col">

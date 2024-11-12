@@ -1,3 +1,4 @@
+import { UserInfo } from "@/types/user_info";
 import { UserSummary } from "@/types/user_summary";
 
 const sampleSummaries: UserSummary[] = [
@@ -24,4 +25,12 @@ const sampleSummaries: UserSummary[] = [
   },
 ];
 
-export default sampleSummaries;
+const sampleUserInfo: UserInfo = {
+  createdAt: "2024-11-11T06:57:59.579836Z",
+  subscriptionTier: 0,
+  dailyRequestCount: 0,
+  lastRequestAt: "2024-11-12T04:47:02.232937Z",
+  username: "email@example.com",
+};
+
+export { sampleSummaries, sampleUserInfo };
