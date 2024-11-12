@@ -1,9 +1,10 @@
 import logging
+from typing import Optional
 
 import torch
+from app.utils.summary_service import SummaryService
 from pydantic import BaseModel
 from transformers import pipeline
-from utils.summary_service import SummaryService
 
 from fastapi import Body, FastAPI, HTTPException
 
@@ -13,6 +14,7 @@ class TextSummaryResponse(BaseModel):
 
 
 class ArticleSummaryResponse(BaseModel):
+    title: Optional[str]
     article_text: str
     summary_text: str
 
@@ -38,10 +40,16 @@ async def summarize_text(text: str = Body(...)):
 
 @app.post("/summarize/article")
 async def summarize_article(url: str = Body(...)):
-    article_text = await summary_service.fetch_article_content(url)
-    if article_text is None:
+    response = await summary_service.fetch_article_content(url)
+    if response is None:
         raise HTTPException(
             status_code=404, detail="Failed to fetch the article content"
         )
+    title = response.get("title")
+    article_text = response.get("article_text")
+    if not article_text:
+        raise HTTPException(status_code=404, detail="Failed to extract article text")
     summary = await summary_service.text_summary(article_text)
-    return ArticleSummaryResponse(article_text=article_text, summary_text=summary)
+    return ArticleSummaryResponse(
+        title=title, article_text=article_text, summary_text=summary
+    )
