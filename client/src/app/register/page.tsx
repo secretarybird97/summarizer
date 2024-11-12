@@ -12,25 +12,34 @@ import {
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+
 import { z } from "zod";
 
-const formSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8),
+const SignupFormSchema = z.object({
+  email: z.string().email({ message: "Please enter a valid email." }).trim(),
+  password: z
+    .string()
+    .min(8, { message: "Be at least 8 characters long" })
+    .regex(/[a-zA-Z]/, { message: "Contain at least one letter." })
+    .regex(/[0-9]/, { message: "Contain at least one number." })
+    .regex(/[^a-zA-Z0-9]/, {
+      message: "Contain at least one special character.",
+    })
+    .trim(),
 });
 
 export default function Page() {
   const form = useForm({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(SignupFormSchema),
     defaultValues: {
       email: "",
       password: "",
     },
   });
 
-  async function handleLogin(values: z.infer<typeof formSchema>) {
+  async function handleRegister(values: z.infer<typeof SignupFormSchema>) {
     try {
-      const response = await fetch("/api/login", {
+      const response = await fetch("/api/register", {
         method: "POST",
         credentials: "include",
         headers: {
@@ -39,12 +48,15 @@ export default function Page() {
         body: JSON.stringify(values),
       });
 
+      console.log(values);
+      console.log(response);
+
       if (!response.ok) {
-        throw new Error("Failed to login");
+        throw new Error("Failed to register");
       }
 
-      console.log("Logged in");
-      window.location.href = "/";
+      console.log("User successfully registered");
+      window.location.href = "/about";
     } catch (error) {
       console.error(error);
     }
@@ -62,7 +74,7 @@ export default function Page() {
           <CardContent>
             <Form {...form}>
               <form
-                onSubmit={form.handleSubmit(handleLogin)}
+                onSubmit={form.handleSubmit(handleRegister)}
                 className="space-y-8 "
               >
                 <FormField
