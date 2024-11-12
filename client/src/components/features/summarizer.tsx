@@ -7,6 +7,8 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { isValidUrl } from "@/lib/utils";
+import { Summary } from "@/types/summary";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -16,12 +18,14 @@ import { Button } from "../ui/button";
 import { Skeleton } from "../ui/skeleton";
 import { Textarea } from "../ui/textarea";
 
+const MIN_TEXT_LENGTH = 30;
+
 const FormSchema = z.object({
-  input: z.string(),
+  input: z.string().min(1, "Input is required"),
 });
 
 export default function Summarizer() {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const [summary, setSummary] = useState<string | null>(null);
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -42,7 +46,15 @@ export default function Summarizer() {
         ip_address: ipAddress,
       };
 
-      const response = await fetch("/api/summary", {
+      const isUrl = isValidUrl(data.input);
+      if (!isUrl && data.input.length < MIN_TEXT_LENGTH) {
+        throw new Error(
+          `Text input should be at least ${MIN_TEXT_LENGTH} characters`
+        );
+      }
+      const endpoint = isUrl ? "/api/summarize/article" : "/api/summarize/text";
+
+      const response = await fetch(endpoint, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -59,8 +71,8 @@ export default function Summarizer() {
         throw new Error("Failed to summarize");
       }
 
-      const result = await response.json();
-      setSummary(result.data.summary_text);
+      const result: Summary = await response.json();
+      setSummary(result.summary_text);
     } catch (error) {
       const message = (error as Error).message;
       setSummary(message);
@@ -92,7 +104,11 @@ export default function Summarizer() {
             </FormItem>
           )}
         />
-        <Button className="w-full h-full align-bottom rounded-none font-bold leading-loose bg-intButton hover:bg-rose-500" type="submit" disabled={loading}>
+        <Button
+          className="w-full h-full align-bottom rounded-none font-bold leading-loose bg-intButton hover:bg-rose-500"
+          type="submit"
+          disabled={loading}
+        >
           {loading ? "Summarizing..." : "Generate summary"}
         </Button>
       </form>

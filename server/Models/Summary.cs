@@ -7,7 +7,6 @@ public class Summary
     [Key]
     public string Id { get; set; } = Guid.NewGuid().ToString();
 
-    [MaxLength(30)]
     public string Title { get; set; } = string.Empty;
 
     [Required]

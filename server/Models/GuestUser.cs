@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace server.Models;
 
-public class GuestSummary
+public class GuestUser
 {
     [Key]
     public string Identifier { get; set; } = Guid.NewGuid().ToString();

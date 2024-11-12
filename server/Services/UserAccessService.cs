@@ -31,7 +31,7 @@ public class UserAccessService(SummarizerDbContext dbContext)
         return true;
     }
 
-    public bool CanSummarize([NotNull] GuestSummary guestSummary)
+    public bool CanSummarize([NotNull] GuestUser guestSummary)
     {
         if (guestSummary.Date.Date != DateTime.UtcNow.Date)
         {
