@@ -3,7 +3,7 @@ import MobileNav from "./mobileNav";
 
 export default function SiteHeader() {
   return (
-    <header className="w-full border-b">
+    <header className="w-full border-b h-auto">
       <div className="flex h-14 items-center px-4">
         <MainNav />
         <MobileNav />

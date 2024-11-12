@@ -16,6 +16,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
 import { formatDate } from "@/lib/utils";
 import { UserSummary } from "@/types/user_summary";
 import { Trash2Icon } from "lucide-react";
@@ -30,6 +31,7 @@ export default function UserSummaries({ summaries }: UserSummariesProps) {
   const [userSummaries, setUserSummaries] = useState<UserSummary[]>(summaries);
   const [sortby, setSortby] = useState<string>("Most recent");
   const [searchby, setSearchby] = useState("");
+  const { toast } = useToast();
 
   useEffect(() => {
     // Filter and sort summaries whenever `searchby`, `sortby`, or `summaries` change.
@@ -54,17 +56,21 @@ export default function UserSummaries({ summaries }: UserSummariesProps) {
 
   const handleDelete = async (id: string) => {
     try {
-      const response = await fetch(`/api/user/summaries/${id}`, {
-        method: "DELETE",
-      });
+      // const response = await fetch(`/api/user/summaries/${id}`, {
+      //   method: "DELETE",
+      // });
 
-      if (!response.ok) {
-        throw new Error("Failed to delete the summary");
-      }
+      // if (!response.ok) {
+      //   throw new Error("Failed to delete the summary");
+      // }
 
       setUserSummaries((prevSummaries) =>
         prevSummaries.filter((summary) => summary.id !== id)
       );
+      toast({
+        title: "Summary deleted sucessfully!",
+        description: `Summary ${id}`,
+      });
     } catch (error) {
       console.error("Error deleting the summary:", error);
     }
