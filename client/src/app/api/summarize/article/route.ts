@@ -2,11 +2,16 @@ import { Summary } from "@/types/summary";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
+interface ArticleSummaryRequest {
+  url: string;
+  ipAddress: string;
+}
+
 export async function POST(request: NextRequest) {
   const body = await new Response(request.body).text();
   const data = JSON.parse(body);
 
-  const requestData = {
+  const requestData: ArticleSummaryRequest = {
     url: data.input,
     ipAddress: data.ip_address,
   };

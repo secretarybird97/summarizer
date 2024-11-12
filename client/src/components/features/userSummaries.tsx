@@ -11,18 +11,37 @@ import {
 import { formatDate } from "@/lib/utils";
 import { UserSummary } from "@/types/user_summary";
 import { Trash2Icon } from "lucide-react";
+import { useState } from "react";
 import { ScrollArea } from "../ui/scrollarea";
 
 interface UserSummariesProps {
   summaries: UserSummary[];
 }
 
-// TODO: Implement delete functionality
-
 export default function UserSummaries({ summaries }: UserSummariesProps) {
+  const [userSummaries, setUserSummaries] = useState<UserSummary[]>(summaries);
+
+  const handleDelete = async (id: string) => {
+    try {
+      const response = await fetch(`/api/user/summaries/${id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete the summary");
+      }
+
+      setUserSummaries((prevSummaries) =>
+        prevSummaries.filter((summary) => summary.id !== id)
+      );
+    } catch (error) {
+      console.error("Error deleting the summary:", error);
+    }
+  };
+
   return (
     <ScrollArea className="h-96 w-11/12 rounded-md border p-6">
-      {summaries.map((summary, index) => (
+      {userSummaries.map((summary, index) => (
         <Card
           key={index}
           className="bg-cardsBG w-full h-min border-transparent my-5"
@@ -39,7 +58,10 @@ export default function UserSummaries({ summaries }: UserSummariesProps) {
             <p className="text-justify">{summary.content}</p>
           </CardContent>
           <CardContent className="justify-self-end">
-            <Button className="rounded-none bg-black hover:bg-rose-500">
+            <Button
+              className="rounded-none bg-black hover:bg-rose-500"
+              onClick={() => handleDelete(summary.id)}
+            >
               <Trash2Icon color="white" />{" "}
               <p className="text-white">Delete from history</p>
             </Button>
