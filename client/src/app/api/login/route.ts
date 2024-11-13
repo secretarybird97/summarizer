@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
     if (cookies) {
       return NextResponse.json(
         { status: 200 },
-        { headers: { "set-cookie": cookies } }
+        { headers: { "set-cookie": cookies } },
       );
     } else {
       throw new Error("Failed to set cookies");
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     return NextResponse.json(
       { error: (error as Error).message },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

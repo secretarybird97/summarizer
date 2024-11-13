@@ -49,7 +49,7 @@ export default function Summarizer() {
       const isUrl = isValidUrl(data.input);
       if (!isUrl && data.input.length < MIN_TEXT_LENGTH) {
         throw new Error(
-          `Text input should be at least ${MIN_TEXT_LENGTH} characters`
+          `Text input should be at least ${MIN_TEXT_LENGTH} characters`,
         );
       }
       const endpoint = isUrl ? "/api/summarize/article" : "/api/summarize/text";

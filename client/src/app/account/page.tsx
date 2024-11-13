@@ -9,7 +9,7 @@ import { sampleSummaries, sampleUserInfo } from "./data";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function fetchSummaries() {
   const backendUrl = process.env.BACKEND_URL;
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const cookieHeader = cookieStore
     .getAll()
     .map((cookie) => `${cookie.name}=${cookie.value}`)
@@ -52,7 +52,7 @@ export default async function Page() {
 
   return (
     <div className="flex flex-col">
-      <main className="grid grid-cols-2 items-center justify-items-center pb-20 font-[family-name:var(--font-geist-sans)]">
+      <div className="grid grid-cols-2 items-center justify-items-center pb-20 font-[family-name:var(--font-geist-sans)]">
         <div className="justify-items-center w-full">
           <h1 className="font-bold text-4xl text-NavText mb-10">
             Account History
@@ -60,7 +60,7 @@ export default async function Page() {
           <UserSummaries summaries={summaries} />
         </div>
         <ManagePlan userInfo={userInfo} />
-      </main>
+      </div>
     </div>
   );
 }

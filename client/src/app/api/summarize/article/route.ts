@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     ipAddress: data.ip_address,
   };
 
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const cookieHeader = cookieStore
     .getAll()
     .map((cookie) => `${cookie.name}=${cookie.value}`)
@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
     if (response.status === 429) {
       return NextResponse.json(
         { error: "Too many requests, please try again later" },
-        { status: 429 }
+        { status: 429 },
       );
     }
 
@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     return NextResponse.json(
       { error: (error as Error).message },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -36,18 +36,18 @@ export default function UserSummaries({ summaries }: UserSummariesProps) {
   useEffect(() => {
     // Filter and sort summaries whenever `searchby`, `sortby`, or `summaries` change.
     let filteredSummaries = summaries.filter((summary) =>
-      summary.title.toLowerCase().includes(searchby.toLowerCase())
+      summary.title.toLowerCase().includes(searchby.toLowerCase()),
     );
 
     if (sortby === "Most recent") {
       filteredSummaries = filteredSummaries.sort(
         (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
       );
     } else {
       filteredSummaries = filteredSummaries.sort(
         (a, b) =>
-          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
       );
     }
 
@@ -65,7 +65,7 @@ export default function UserSummaries({ summaries }: UserSummariesProps) {
       // }
 
       setUserSummaries((prevSummaries) =>
-        prevSummaries.filter((summary) => summary.id !== id)
+        prevSummaries.filter((summary) => summary.id !== id),
       );
       toast({
         title: "Summary deleted sucessfully!",

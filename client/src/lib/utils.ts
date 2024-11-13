@@ -13,12 +13,11 @@ export function formatDate(dateString: string) {
   return `${month}/${day}/${year}`;
 }
 
-export function isValidUrl(input: string){
+export function isValidUrl(input: string) {
   try {
     new URL(input);
     return true;
-  }
-  catch {
+  } catch {
     return false;
   }
 }
