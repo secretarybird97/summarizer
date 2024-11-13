@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 
 export default async function GET() {
   const backendUrl = process.env.BACKEND_URL;
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const cookieHeader = cookieStore
     .getAll()
     .map((cookie) => `${cookie.name}=${cookie.value}`)
