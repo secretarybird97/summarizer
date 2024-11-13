@@ -1,8 +1,8 @@
 import PlanCard from "@/components/features/planCard";
 export default function Page() {
   return (
-    <div className="flex min-h-screen flex-col">
-      <main className="grid grid-cols-2 items-center justify-items-center min-h-screen pb-20 font-[family-name:var(--font-geist-sans)]">
+    <div className="flex flex-col">
+      <main className="grid grid-cols-2 items-center justify-items-center pb-20 font-[family-name:var(--font-geist-sans)]">
         <div className="justify-items-center w-10/12 ">
           <h1 className="font-bold ">About Summarizer</h1>
           <p className="text-justify">

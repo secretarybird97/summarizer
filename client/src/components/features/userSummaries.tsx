@@ -125,7 +125,7 @@ export default function UserSummaries({ summaries }: UserSummariesProps) {
             </CardContent>
             <CardContent className="justify-self-end">
               <Button
-                className="rounded-none bg-black hover:bg-rose-500"
+                variant="destructive"
                 onClick={() => handleDelete(summary.id)}
               >
                 <Trash2Icon color="white" />{" "}

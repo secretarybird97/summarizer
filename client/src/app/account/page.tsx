@@ -51,11 +51,11 @@ export default async function Page() {
   const userInfo: UserInfo = sampleUserInfo;
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <main className="grid grid-cols-2 items-center justify-items-center min-h-screen pb-20 font-[family-name:var(--font-geist-sans)]">
+    <div className="flex flex-col">
+      <main className="grid grid-cols-2 items-center justify-items-center pb-20 font-[family-name:var(--font-geist-sans)]">
         <div className="justify-items-center w-full">
           <h1 className="font-bold text-4xl text-NavText mb-10">
-            Summaries history
+            Account History
           </h1>
           <UserSummaries summaries={summaries} />
         </div>

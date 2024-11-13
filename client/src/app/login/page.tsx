@@ -53,7 +53,7 @@ export default function Page() {
 
   return (
     <>
-      <main className="grid items-center justify-items-center min-h-screen pb-20 font-[family-name:var(--font-geist-sans)]">
+      <main className="grid items-center justify-items-center pb-20 font-[family-name:var(--font-geist-sans)]">
         <Card className="bg-cardsBG w-3/12 h-min border-NavText">
           <CardHeader>
             <CardTitle className="text-NavText font-bold">
@@ -64,7 +64,7 @@ export default function Page() {
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(handleLogin)}
-                className="space-y-8 "
+                className="space-y-8"
               >
                 <FormField
                   control={form.control}
@@ -105,18 +105,15 @@ export default function Page() {
                   )}
                 />
                 <Button
-                  className="w-full h-full align-bottom rounded-none font-bold leading-loose bg-intButton hover:bg-rose-500"
+                  className="w-full h-full align-bottom rounded-none font-bold leading-loose bg-intButton hover:bg-rose-400"
                   type="submit"
                 >
                   Log in
                 </Button>
               </form>
             </Form>
-            <div className="grid grid-cols-2">
-              <Button variant="link" className="w-full">
-                <a href="/register">Don&apos;t have an account?</a>
-              </Button>
-              <Button variant="link" className="w-full">
+            <div className="flex justify-end mt-4 w-full overflow-hidden">
+              <Button variant="link" className="text-sm whitespace-nowrap">
                 <a href="/recover">Forgot your password?</a>
               </Button>
             </div>

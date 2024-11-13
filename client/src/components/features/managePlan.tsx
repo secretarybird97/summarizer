@@ -13,7 +13,7 @@ export default function ManagePlan({ userInfo }: { userInfo: UserInfo }) {
   const isPremium = userInfo.subscriptionTier === 1;
 
   return (
-    <Card className="bg-cardsBG w-5/12 h-min border-NavText">
+    <Card className="bg-cardsBG w-5/12 h-min border-secondary">
       <CardHeader>
         <CardTitle className="text-NavText font-bold">
           {isPremium ? "Premium Plan" : "Basic Plan"}
@@ -40,7 +40,7 @@ export default function ManagePlan({ userInfo }: { userInfo: UserInfo }) {
         </ul>
         <br />
         <br />
-        <Button className="w-full h-full align-bottom rounded-none font-bold leading-loose bg-intButton hover:bg-rose-500">
+        <Button className="w-full h-full align-bottom font-bold leading-loose bg-intButton hover:bg-rose-400">
           <a href="/about">Change Plan</a>
         </Button>
       </CardContent>

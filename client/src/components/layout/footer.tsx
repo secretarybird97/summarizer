@@ -1,9 +1,20 @@
-export default function Footer() {
-  return <footer className="w-full border-t">
-    <div className="grid grid-cols-2 content-center justify-between justify-self-stretch justify-items-stretch h-12">
-      <p className="font-bold text-start font-serif text-NavText">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Copyright (c) 2024 Summarizer</p>
-      <p className="font-bold text-end font-serif text-NavText">Github Icon&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+import { GitHubLogoIcon } from "@radix-ui/react-icons";
 
+export default function Footer() {
+  return (
+    <footer className="w-full border-t py-2">
+      <div className="flex justify-between items-center mx-4">
+        <p className="font-bold font-serif text-NavText">© 2024 Summarizer</p>
+        <a
+          href="https://github.com/your-repo-link"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-NavText hover:text-gray-600"
+          aria-label="GitHub"
+        >
+          <GitHubLogoIcon className="w-6 h-6" />
+        </a>
       </div>
-  </footer>;
+    </footer>
+  );
 }

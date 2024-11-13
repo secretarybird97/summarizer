@@ -1,5 +1,5 @@
 import Footer from "@/components/layout/footer";
-import SiteHeader from "@/components/layout/siteHeader";
+import NavBar from "@/components/layout/navBar";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
 import type { Metadata } from "next";
@@ -28,9 +28,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="h-full">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased h-full flex flex-col`}
       >
         <ThemeProvider
           attribute="class"
@@ -38,10 +38,10 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <SiteHeader />
-          {children}
-          <Toaster />
+          <NavBar />
+          <main className="flex-grow mt-4">{children}</main>
           <Footer />
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>

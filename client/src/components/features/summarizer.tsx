@@ -92,7 +92,7 @@ export default function Summarizer() {
           name="input"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Input</FormLabel>
+              <FormLabel>What do you want to summarize?</FormLabel>
               <FormControl>
                 <Textarea
                   placeholder="Insert URL or text for summary"
@@ -105,7 +105,7 @@ export default function Summarizer() {
           )}
         />
         <Button
-          className="w-full h-full align-bottom rounded-none font-bold leading-loose bg-intButton hover:bg-rose-500"
+          className="w-full h-full align-bottom font-bold leading-loose bg-intButton hover:bg-rose-400"
           type="submit"
           disabled={loading}
         >

@@ -7,14 +7,14 @@ const sampleSummaries: UserSummary[] = [
     title: "CrowdStrike outage",
     content:
       "Experts warn of opportunistic hacking attempts linked to the CrowdStrike outage. Cyber agencies in the UK and Australia are warning people to be vigilant to fake emails, calls and websites that pretend to be official. CrowdStrike head George Kurtz encouraged users to make sure they were speaking to official representatives before downloading fixes.",
-    createdAt: "2024-11-11T04:10:41.094481Z",
+    createdAt: "2022-11-11T04:10:41.094481Z",
   },
   {
     id: "eb0e5337-929d-41f3-89dd-92097ae36a9d",
     title: "Trump calls Michelle Obama a “hater”",
     content:
       "At a rally in Atlanta, Donald Trump called the former first lady a “hater,” in response to her comments saying he had displayed “erratic behavior” and “obvious mental decline” “I always tried to be so nice and respectful,’ said Mr. Trump, who in 2011 spent weeks spreading the lie that Barack Obama was actually born in Kenya.",
-    createdAt: "2024-11-11T04:12:30.291493Z",
+    createdAt: "2023-11-11T04:12:30.291493Z",
   },
   {
     id: "b3e73546-e050-4fb2-83b6-6a53df5ce57a",
