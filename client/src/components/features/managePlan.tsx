@@ -18,13 +18,31 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { toast } from "@/hooks/use-toast";
 import { UserInfo } from "@/types/user_info";
+import { useState } from "react";
 
 export default function ManagePlan({ userInfo }: { userInfo: UserInfo }) {
-  const isPremium = userInfo.subscriptionTier === 1;
+  const [isPremium, setIsPremium] = useState(userInfo.subscriptionTier === 1);
+  //let isPremium = userInfo.subscriptionTier === 1;
 
+
+  const managePlan = async () => {
+    try {
+      
+      setIsPremium(!isPremium);
+      let desc = !isPremium ? `Premium plan activated` : 'Basic plan activated';
+      toast({
+        title: "Plan changed sucessfully!",
+        description: desc,
+      });
+    } catch (error) {
+      console.error("Error changing the plan:", error);
+    }
+  };
+  
   return (
-    <Card className="bg-cardsBG w-5/12 h-min border-secondary">
+    <Card className="bg-cardsBG w-5/12 h-min border-NavText">
       <CardHeader>
         <CardTitle className="text-NavText font-bold">
           {isPremium ? "Premium Plan" : "Basic Plan"}
@@ -67,7 +85,11 @@ export default function ManagePlan({ userInfo }: { userInfo: UserInfo }) {
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction>Continue</AlertDialogAction>
+              <AlertDialogAction asChild>
+                <Button onClick={managePlan}>
+                  Continue
+                </Button>
+              </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>

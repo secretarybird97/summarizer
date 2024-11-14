@@ -105,7 +105,7 @@ export default function Page() {
                   )}
                 />
                 <Button
-                  className="w-full h-full align-bottom rounded-none font-bold leading-loose bg-intButton hover:bg-rose-400"
+                  className="w-full h-full align-bottom font-bold leading-loose bg-intButton hover:bg-rose-400"
                   type="submit"
                 >
                   Log in

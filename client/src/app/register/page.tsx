@@ -64,7 +64,7 @@ export default function Page() {
 
   return (
     <>
-      <main className="grid items-center justify-items-center min-h-screen pb-20 font-[family-name:var(--font-geist-sans)]">
+      <main className="grid items-center justify-items-center pb-20 font-[family-name:var(--font-geist-sans)]">
         <Card className="bg-cardsBG w-3/12 h-min border-NavText">
           <CardHeader>
             <CardTitle className="text-NavText font-bold">
