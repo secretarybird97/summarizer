@@ -19,12 +19,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
-import { UserInfo } from "@/types/user_info";
+import { AccountDetails } from "@/types/account-details";
 import { useState } from "react";
 
-export default function ManagePlan({ userInfo }: { userInfo: UserInfo }) {
+export default function ManagePlan({ userInfo }: { userInfo: AccountDetails }) {
   const [isPremium, setIsPremium] = useState(userInfo.subscriptionTier === 1);
-  //let isPremium = userInfo.subscriptionTier === 1;
 
   const managePlan = async () => {
     try {
@@ -40,7 +39,7 @@ export default function ManagePlan({ userInfo }: { userInfo: UserInfo }) {
   };
 
   return (
-    <Card className="bg-cardsBG w-5/12 h-min border-NavText">
+    <Card className="bg-cardsBG w-5/12 h-min border-secondary">
       <CardHeader>
         <CardTitle className="text-NavText font-bold">
           {isPremium ? "Premium Plan" : "Basic Plan"}

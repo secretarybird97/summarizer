@@ -27,11 +27,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { useDebounce } from "@/hooks/use-debounce";
 import { useToast } from "@/hooks/use-toast";
 import { formatDate } from "@/lib/utils";
-import { UserSummary } from "@/types/user_summary";
+import { UserSummary } from "@/types/user-summary";
 import { Trash2Icon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ScrollArea } from "../ui/scrollarea";
 
 interface UserSummariesProps {
@@ -40,53 +41,54 @@ interface UserSummariesProps {
 
 export default function UserSummaries({ summaries }: UserSummariesProps) {
   const [userSummaries, setUserSummaries] = useState<UserSummary[]>(summaries);
+  const [filteredSummaries, setFilteredSummaries] =
+    useState<UserSummary[]>(userSummaries);
   const [sortby, setSortby] = useState<string>("Most recent");
-  const [searchby, setSearchby] = useState("");
+  const [searchby, setSearchby] = useState<string>("");
+  const debouncedSearch = useDebounce(searchby, 300);
   const { toast } = useToast();
 
   useEffect(() => {
-    // Filter and sort summaries whenever `searchby`, `sortby`, or `summaries` change.
-    let filteredSummaries = summaries.filter((summary) =>
+    let newFilteredSummaries = userSummaries.filter((summary) =>
       summary.title.toLowerCase().includes(searchby.toLowerCase()),
     );
 
     if (sortby === "Most recent") {
-      filteredSummaries = filteredSummaries.sort(
+      newFilteredSummaries = newFilteredSummaries.sort(
         (a, b) =>
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
       );
     } else {
-      filteredSummaries = filteredSummaries.sort(
+      newFilteredSummaries = newFilteredSummaries.sort(
         (a, b) =>
           new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
       );
     }
 
-    setUserSummaries(filteredSummaries);
-  }, [searchby, sortby, summaries]);
+    setFilteredSummaries(newFilteredSummaries);
+  }, [debouncedSearch, sortby, userSummaries]);
+
+  const memoizedFilteredSummaries = useMemo(
+    () => filteredSummaries,
+    [filteredSummaries],
+  );
 
   const handleDelete = async (id: string) => {
     try {
-      // const response = await fetch(`/api/user/summaries/${id}`, {
-      //   method: "DELETE",
-      // });
+      const response = await fetch(`/api/user/summaries/${id}`, {
+        method: "DELETE",
+      });
 
-      // if (!response.ok) {
-      //   throw new Error("Failed to delete the summary");
-      // }
-      let title = userSummaries.filter((summary) => summary.id == id)[0].title;
-      let desc = " ";
-      if (title == "") {
-        desc = `${id}`;
-      } else {
-        desc = `${title}`;
+      if (!response.ok) {
+        throw new Error("Failed to delete the summary");
       }
+
       setUserSummaries((prevSummaries) =>
         prevSummaries.filter((summary) => summary.id !== id),
       );
       toast({
         title: "Summary deleted sucessfully!",
-        description: `Summary ${desc}`,
+        description: `ID: ${id}`,
       });
     } catch (error) {
       console.error("Error deleting the summary:", error);
@@ -124,8 +126,8 @@ export default function UserSummaries({ summaries }: UserSummariesProps) {
         </DropdownMenu>
       </div>
       <ScrollArea className="h-96 w-11/12 rounded-md border p-6">
-        {userSummaries.length == 0 ? (
-          searchby == "" ? (
+        {memoizedFilteredSummaries.length === 0 ? (
+          searchby === "" ? (
             <h1 className="text-NavText text-4xl font-bold self-center justify-self-center">
               Nothing here yet
             </h1>
@@ -136,7 +138,7 @@ export default function UserSummaries({ summaries }: UserSummariesProps) {
           )
         ) : (
           <>
-            {userSummaries.map((summary) => (
+            {memoizedFilteredSummaries.map((summary) => (
               <Card
                 key={summary.id}
                 className="bg-cardsBG w-full h-min border-transparent my-5"
@@ -152,12 +154,9 @@ export default function UserSummaries({ summaries }: UserSummariesProps) {
                 <CardContent className="text-white">
                   <p className="text-justify">{summary.content}</p>
                 </CardContent>
-                <CardContent className="text-white">
-                  <p className="text-justify">{}</p>
-                </CardContent>
                 <CardContent className="justify-self-end">
                   <AlertDialog>
-                    <AlertDialogTrigger asChild>
+                    <AlertDialogTrigger>
                       <Button variant="destructive">
                         <Trash2Icon color="white" />{" "}
                         <p className="text-white">Delete from history</p>

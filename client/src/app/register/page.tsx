@@ -64,11 +64,11 @@ export default function Page() {
 
   return (
     <>
-      <main className="grid items-center justify-items-center pb-20 font-[family-name:var(--font-geist-sans)]">
+      <main className="grid items-center justify-items-center pb-20 font-[family-name:var(--font-geist-sans)] mt-16">
         <Card className="bg-cardsBG w-3/12 h-min border-NavText">
           <CardHeader>
             <CardTitle className="text-NavText font-bold">
-              Create account
+              Create an account
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -136,15 +136,15 @@ export default function Page() {
                   )}
                 />
                 <Button
-                  className="w-full h-full align-bottom rounded-none font-bold leading-loose bg-intButton hover:bg-rose-500"
+                  className="w-full h-full align-bottom font-bold leading-loose bg-intButton hover:bg-rose-500"
                   type="submit"
                 >
                   Sign up
                 </Button>
               </form>
             </Form>
-            <div className="grid grid-cols-2">
-              <Button variant="link">
+            <div className="flex justify-end mt-4 w-full overflow-hidden">
+              <Button variant="link" className="text-sm whitespace-nowrap">
                 <a href="/login">Already have an account?</a>
               </Button>
             </div>

@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { login } from "../actions";
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -31,18 +32,7 @@ export default function Page() {
 
   async function handleLogin(values: z.infer<typeof formSchema>) {
     try {
-      const response = await fetch("/api/login", {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to login");
-      }
+      await login(values);
 
       console.log("Logged in");
       window.location.href = "/";
@@ -53,7 +43,7 @@ export default function Page() {
 
   return (
     <>
-      <main className="grid items-center justify-items-center pb-20 font-[family-name:var(--font-geist-sans)]">
+      <div className="grid items-center justify-items-center pb-20 font-[family-name:var(--font-geist-sans)] mt-16">
         <Card className="bg-cardsBG w-3/12 h-min border-NavText">
           <CardHeader>
             <CardTitle className="text-NavText font-bold">
@@ -119,7 +109,7 @@ export default function Page() {
             </div>
           </CardContent>
         </Card>
-      </main>
+      </div>
     </>
   );
 }

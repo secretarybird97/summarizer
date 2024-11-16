@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import * as React from "react";
 
+import { logout } from "@/app/actions";
 import { Button } from "@/components/ui/button";
 import {
   NavigationMenu,
@@ -19,15 +20,34 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 const navItems = [
   { name: "Home", href: "/" },
   { name: "About", href: "/about" },
-  { name: "Login", href: "/login" },
-  { name: "Account", href: "/account" },
-  { name: "Register", href: "/register" },
 ];
 
-export default function NavBar() {
+async function handleLogout() {
+  try {
+    await logout();
+    window.location.href = "/";
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+interface NavBarProps {
+  isAuthenticated: boolean;
+}
+
+export default function NavBar({ isAuthenticated }: NavBarProps) {
   const pathname = usePathname();
   const { setTheme, theme } = useTheme();
   const [isOpen, setIsOpen] = React.useState(false);
+
+  const authNavItems = isAuthenticated
+    ? [{ name: "Account", href: "/account" }]
+    : [
+        { name: "Login", href: "/login" },
+        { name: "Sign Up", href: "/register" },
+      ];
+
+  const allNavItems = [...navItems, ...authNavItems];
 
   return (
     <header className="sticky top-0 z-50 w-full border-b mb-16 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -40,7 +60,7 @@ export default function NavBar() {
           </Link>
           <NavigationMenu>
             <NavigationMenuList>
-              {navItems.map((item) => (
+              {allNavItems.map((item) => (
                 <NavigationMenuItem key={item.name}>
                   <Link href={item.href} legacyBehavior passHref>
                     <NavigationMenuLink
@@ -70,7 +90,7 @@ export default function NavBar() {
               Home
             </MobileLink>
             <nav className="flex flex-col space-y-3">
-              {navItems.map((item) => (
+              {allNavItems.map((item) => (
                 <MobileLink
                   key={item.href}
                   href={item.href}
@@ -95,6 +115,11 @@ export default function NavBar() {
               <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
               <span className="sr-only">Toggle Theme</span>
             </Button>
+            {isAuthenticated && (
+              <Button variant="destructive" onClick={handleLogout}>
+                Logout
+              </Button>
+            )}
           </nav>
         </div>
       </div>

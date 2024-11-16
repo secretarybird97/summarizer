@@ -6,7 +6,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { formatDate } from "@/lib/utils";
-import { UserSummary } from "@/types/user_summary";
+import { UserSummary } from "@/types/user-summary";
 import { Trash2Icon } from "lucide-react";
 import { useState } from "react";
 import { Button } from "../ui/button";

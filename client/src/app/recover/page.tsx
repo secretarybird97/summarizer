@@ -30,7 +30,7 @@ export default function Page() {
 
   return (
     <>
-      <main className="grid  justify-items-center min-h-screen pb-20 font-[family-name:var(--font-geist-sans)]">
+      <div className="grid items-center justify-items-center pb-20 font-[family-name:var(--font-geist-sans)] mt-16">
         <Card className="bg-cardsBG w-3/12 h-min border-NavText">
           <CardHeader>
             <CardTitle className="text-NavText font-bold">
@@ -76,7 +76,7 @@ export default function Page() {
             </div>
           </CardContent>
         </Card>
-      </main>
+      </div>
     </>
   );
 }
