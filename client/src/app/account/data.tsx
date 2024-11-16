@@ -18,7 +18,7 @@ const sampleSummaries: UserSummary[] = [
   },
   {
     id: "b3e73546-e050-4fb2-83b6-6a53df5ce57a",
-    title: "Random",
+    title: "",
     content:
       'www.dailymail.co.uk/news/world-news/2013/01/27/kremlin-spokesman-spoke-out-against-Russian-troops.html#storylink=cpy. http://www.reuters.com/article/2013-01-27/remlin-speaks-out against- Russian-troopers.html"',
     createdAt: "2024-11-11T04:13:18.535101Z",

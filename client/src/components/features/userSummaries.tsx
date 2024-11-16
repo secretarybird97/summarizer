@@ -74,12 +74,20 @@ export default function UserSummaries({ summaries }: UserSummariesProps) {
       // if (!response.ok) {
       //   throw new Error("Failed to delete the summary");
       // }
+      let title = userSummaries.filter((summary) => summary.id == id)[0].title
+      let desc=" "
+      if (title=="") {
+        desc = `${id}`
+      }
+      else {
+        desc = `${title}`
+      }
       setUserSummaries((prevSummaries) =>
         prevSummaries.filter((summary) => summary.id !== id),
       );
       toast({
         title: "Summary deleted sucessfully!",
-        description: `Summary ${id}`,
+        description: `Summary ${desc}`,
       });
     } catch (error) {
       console.error("Error deleting the summary:", error);
@@ -124,7 +132,10 @@ export default function UserSummaries({ summaries }: UserSummariesProps) {
           >
             <CardHeader>
               <CardTitle className="text-NavText font-bold self-center">
-                {summary.title}
+                {summary.title!="" 
+                ? summary.title
+                : summary.id
+                }
               </CardTitle>
               <CardDescription className="text-white self-end">
                 Generated on {formatDate(summary.createdAt)}
@@ -133,9 +144,12 @@ export default function UserSummaries({ summaries }: UserSummariesProps) {
             <CardContent className="text-white">
               <p className="text-justify">{summary.content}</p>
             </CardContent>
+            <CardContent className="text-white">
+              <p className="text-justify">{}</p>
+            </CardContent>
             <CardContent className="justify-self-end">
               <AlertDialog>
-                <AlertDialogTrigger>
+                <AlertDialogTrigger asChild>
                   <Button variant="destructive">
                     <Trash2Icon color="white" />{" "}
                     <p className="text-white">Delete from history</p>
