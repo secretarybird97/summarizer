@@ -26,12 +26,10 @@ export default function ManagePlan({ userInfo }: { userInfo: UserInfo }) {
   const [isPremium, setIsPremium] = useState(userInfo.subscriptionTier === 1);
   //let isPremium = userInfo.subscriptionTier === 1;
 
-
   const managePlan = async () => {
     try {
-      
       setIsPremium(!isPremium);
-      let desc = !isPremium ? `Premium plan activated` : 'Basic plan activated';
+      let desc = !isPremium ? `Premium plan activated` : "Basic plan activated";
       toast({
         title: "Plan changed sucessfully!",
         description: desc,
@@ -40,7 +38,7 @@ export default function ManagePlan({ userInfo }: { userInfo: UserInfo }) {
       console.error("Error changing the plan:", error);
     }
   };
-  
+
   return (
     <Card className="bg-cardsBG w-5/12 h-min border-NavText">
       <CardHeader>
@@ -86,9 +84,7 @@ export default function ManagePlan({ userInfo }: { userInfo: UserInfo }) {
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
               <AlertDialogAction asChild>
-                <Button onClick={managePlan}>
-                  Continue
-                </Button>
+                <Button onClick={managePlan}>Continue</Button>
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

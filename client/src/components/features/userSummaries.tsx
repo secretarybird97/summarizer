@@ -74,13 +74,12 @@ export default function UserSummaries({ summaries }: UserSummariesProps) {
       // if (!response.ok) {
       //   throw new Error("Failed to delete the summary");
       // }
-      let title = userSummaries.filter((summary) => summary.id == id)[0].title
-      let desc=" "
-      if (title=="") {
-        desc = `${id}`
-      }
-      else {
-        desc = `${title}`
+      let title = userSummaries.filter((summary) => summary.id == id)[0].title;
+      let desc = " ";
+      if (title == "") {
+        desc = `${id}`;
+      } else {
+        desc = `${title}`;
       }
       setUserSummaries((prevSummaries) =>
         prevSummaries.filter((summary) => summary.id !== id),
@@ -125,68 +124,71 @@ export default function UserSummaries({ summaries }: UserSummariesProps) {
         </DropdownMenu>
       </div>
       <ScrollArea className="h-96 w-11/12 rounded-md border p-6">
-      {userSummaries.length==0 ?
-
-        searchby=="" ?
-          <h1 className="text-NavText text-4xl font-bold self-center justify-self-center">Nothing here yet</h1> 
-          :
-          <h1 className="text-NavText text-4xl font-bold self-center justify-self-center">No matches</h1> 
-          
-         :
-        <>
-        {userSummaries.map((summary) => (
-          <Card
-            key={summary.id}
-            className="bg-cardsBG w-full h-min border-transparent my-5"
-          >
-            <CardHeader>
-              <CardTitle className="text-NavText font-bold self-center">
-                {summary.title!="" 
-                ? summary.title
-                : summary.id
-                }
-              </CardTitle>
-              <CardDescription className="text-white self-end">
-                Generated on {formatDate(summary.createdAt)}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="text-white">
-              <p className="text-justify">{summary.content}</p>
-            </CardContent>
-            <CardContent className="text-white">
-              <p className="text-justify">{}</p>
-            </CardContent>
-            <CardContent className="justify-self-end">
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button variant="destructive">
-                    <Trash2Icon color="white" />{" "}
-                    <p className="text-white">Delete from history</p>
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>
-                      Are you absolutely sure?
-                    </AlertDialogTitle>
-                    <AlertDialogDescription>
-                      This action cannot be undone. This will permanently delete your account and remove your data from our servers.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction asChild>
-                      <Button onClick={() => handleDelete(summary.id)}>
-                        Continue
+        {userSummaries.length == 0 ? (
+          searchby == "" ? (
+            <h1 className="text-NavText text-4xl font-bold self-center justify-self-center">
+              Nothing here yet
+            </h1>
+          ) : (
+            <h1 className="text-NavText text-4xl font-bold self-center justify-self-center">
+              No matches
+            </h1>
+          )
+        ) : (
+          <>
+            {userSummaries.map((summary) => (
+              <Card
+                key={summary.id}
+                className="bg-cardsBG w-full h-min border-transparent my-5"
+              >
+                <CardHeader>
+                  <CardTitle className="text-NavText font-bold self-center">
+                    {summary.title != "" ? summary.title : summary.id}
+                  </CardTitle>
+                  <CardDescription className="text-white self-end">
+                    Generated on {formatDate(summary.createdAt)}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="text-white">
+                  <p className="text-justify">{summary.content}</p>
+                </CardContent>
+                <CardContent className="text-white">
+                  <p className="text-justify">{}</p>
+                </CardContent>
+                <CardContent className="justify-self-end">
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="destructive">
+                        <Trash2Icon color="white" />{" "}
+                        <p className="text-white">Delete from history</p>
                       </Button>
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </CardContent>
-          </Card>
-        ))}</>
-      }
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>
+                          Are you absolutely sure?
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This action cannot be undone. This will permanently
+                          delete your account and remove your data from our
+                          servers.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction asChild>
+                          <Button onClick={() => handleDelete(summary.id)}>
+                            Continue
+                          </Button>
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </CardContent>
+              </Card>
+            ))}
+          </>
+        )}
       </ScrollArea>
     </>
   );

@@ -21,7 +21,7 @@ const navItems = [
   { name: "About", href: "/about" },
   { name: "Login", href: "/login" },
   { name: "Account", href: "/account" },
-  { name: "Register", href: "/register"},
+  { name: "Register", href: "/register" },
 ];
 
 export default function NavBar() {

@@ -70,7 +70,7 @@ export default function Page() {
               </form>
             </Form>
             <div className="flex justify-end mt-4 w-full overflow-hidden">
-            <Button variant="link" className="text-sm whitespace-nowrap">
+              <Button variant="link" className="text-sm whitespace-nowrap">
                 <a href="/login">Back to login screen</a>
               </Button>
             </div>
