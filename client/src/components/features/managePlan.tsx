@@ -18,9 +18,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { UserInfo } from "@/types/user_info";
+import { AccountDetails } from "@/types/account-details";
 
-export default function ManagePlan({ userInfo }: { userInfo: UserInfo }) {
+export default function ManagePlan({ userInfo }: { userInfo: AccountDetails }) {
   const isPremium = userInfo.subscriptionTier === 1;
 
   return (

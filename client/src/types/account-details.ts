@@ -1,4 +1,4 @@
-export type UserInfo = {
+export type AccountDetails = {
   createdAt: string;
   subscriptionTier: number;
   dailyRequestCount: number;
