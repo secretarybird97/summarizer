@@ -1,5 +1,5 @@
 import Footer from "@/components/layout/footer";
-import NavBar from "@/components/layout/navBar";
+import NavBarWrapper from "@/components/layout/navBarWrapper";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
 import type { Metadata } from "next";
@@ -38,7 +38,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <NavBar />
+          <NavBarWrapper />
           <main className="flex-grow mt-4">{children}</main>
           <Footer />
           <Toaster />

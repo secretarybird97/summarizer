@@ -1,5 +1,5 @@
-import { UserInfo } from "@/types/user_info";
-import { UserSummary } from "@/types/user_summary";
+import { AccountDetails } from "@/types/account-details";
+import { UserSummary } from "@/types/user-summary";
 
 const sampleSummaries: UserSummary[] = [
   {
@@ -25,7 +25,7 @@ const sampleSummaries: UserSummary[] = [
   },
 ];
 
-const sampleUserInfo: UserInfo = {
+const sampleUserInfo: AccountDetails = {
   createdAt: "2024-11-11T06:57:59.579836Z",
   subscriptionTier: 0,
   dailyRequestCount: 0,

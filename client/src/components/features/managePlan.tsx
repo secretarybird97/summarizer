@@ -18,31 +18,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { toast } from "@/hooks/use-toast";
-import { UserInfo } from "@/types/user_info";
-import { useState } from "react";
+import { AccountDetails } from "@/types/account-details";
 
-export default function ManagePlan({ userInfo }: { userInfo: UserInfo }) {
-  const [isPremium, setIsPremium] = useState(userInfo.subscriptionTier === 1);
-  //let isPremium = userInfo.subscriptionTier === 1;
+export default function ManagePlan({ userInfo }: { userInfo: AccountDetails }) {
+  const isPremium = userInfo.subscriptionTier === 1;
 
-
-  const managePlan = async () => {
-    try {
-      
-      setIsPremium(!isPremium);
-      let desc = !isPremium ? `Premium plan activated` : 'Basic plan activated';
-      toast({
-        title: "Plan changed sucessfully!",
-        description: desc,
-      });
-    } catch (error) {
-      console.error("Error changing the plan:", error);
-    }
-  };
-  
   return (
-    <Card className="bg-cardsBG w-5/12 h-min border-NavText">
+    <Card className="bg-cardsBG w-5/12 h-min border-secondary">
       <CardHeader>
         <CardTitle className="text-NavText font-bold">
           {isPremium ? "Premium Plan" : "Basic Plan"}
@@ -85,11 +67,7 @@ export default function ManagePlan({ userInfo }: { userInfo: UserInfo }) {
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction asChild>
-                <Button onClick={managePlan}>
-                  Continue
-                </Button>
-              </AlertDialogAction>
+              <AlertDialogAction>Continue</AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>

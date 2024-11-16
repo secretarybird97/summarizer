@@ -30,7 +30,7 @@ export default function Page() {
 
   return (
     <>
-      <main className="grid  justify-items-center min-h-screen pb-20 font-[family-name:var(--font-geist-sans)]">
+      <div className="grid items-center justify-items-center pb-20 font-[family-name:var(--font-geist-sans)] mt-16">
         <Card className="bg-cardsBG w-3/12 h-min border-NavText">
           <CardHeader>
             <CardTitle className="text-NavText font-bold">
@@ -70,13 +70,13 @@ export default function Page() {
               </form>
             </Form>
             <div className="flex justify-end mt-4 w-full overflow-hidden">
-            <Button variant="link" className="text-sm whitespace-nowrap">
+              <Button variant="link" className="text-sm whitespace-nowrap">
                 <a href="/login">Back to login screen</a>
               </Button>
             </div>
           </CardContent>
         </Card>
-      </main>
+      </div>
     </>
   );
 }
