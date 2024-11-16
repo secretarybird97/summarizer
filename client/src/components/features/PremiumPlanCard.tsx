@@ -8,13 +8,13 @@ import {
   CardTitle,
 } from "../ui/card";
 
-export default function PlanCard() {
+export default function PremiumPlanCard() {
   return (
-    <Card className="bg-cardsBG w-5/12 h-min border-NavText">
+    <Card className="bg-cardsBG w-8/12 h-64 border-NavText">
       <CardHeader>
-        <CardTitle className="text-NavText font-bold">Upgrade Plan</CardTitle>
+        <CardTitle className="text-NavText font-bold">Premium Plan</CardTitle>
         <CardDescription className="text-white">
-          Upgrade your subscription plan and enjoy enhanced functions.
+          Premium plan with access to unlimited features.
         </CardDescription>
         <CardDescription className="text-white font-bold">
           $6.99 / Month{" "}
@@ -25,11 +25,6 @@ export default function PlanCard() {
           <li>Unlimited summaries.</li>
           <li>Unlimited storage of summaries.</li>
         </ul>
-        <br />
-        <br />
-        <Button className="w-full h-full align-bottom rounded-none font-bold leading-loose bg-intButton hover:bg-rose-500">
-          Upgrade
-        </Button>
       </CardContent>
     </Card>
   );

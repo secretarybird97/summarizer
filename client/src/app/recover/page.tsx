@@ -28,28 +28,6 @@ export default function Page() {
     },
   });
 
-  async function handleLogin(values: z.infer<typeof formSchema>) {
-    try {
-      const response = await fetch("/api/login", {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to login");
-      }
-
-      console.log("Logged in");
-      window.location.href = "/";
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
   return (
     <>
       <div className="grid items-center justify-items-center pb-20 font-[family-name:var(--font-geist-sans)] mt-16">
@@ -62,7 +40,7 @@ export default function Page() {
           <CardContent>
             <Form {...form}>
               <form
-                onSubmit={form.handleSubmit(handleLogin)}
+                onSubmit={form.handleSubmit(() => {})}
                 className="space-y-8 "
               >
                 <FormField
@@ -84,15 +62,15 @@ export default function Page() {
                   )}
                 />
                 <Button
-                  className="w-full h-full align-bottom rounded-none font-bold leading-loose bg-intButton hover:bg-rose-500"
+                  className="w-full h-full align-bottom font-bold leading-loose bg-intButton hover:bg-rose-500"
                   type="submit"
                 >
                   Send recovery mail
                 </Button>
               </form>
             </Form>
-            <div className="grid grid-cols-2">
-              <Button variant="link">
+            <div className="flex justify-end mt-4 w-full overflow-hidden">
+              <Button variant="link" className="text-sm whitespace-nowrap">
                 <a href="/login">Back to login screen</a>
               </Button>
             </div>

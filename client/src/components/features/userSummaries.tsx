@@ -1,4 +1,15 @@
 "use client";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -88,7 +99,7 @@ export default function UserSummaries({ summaries }: UserSummariesProps) {
     <>
       <div className="grid grid-cols-2 w-full mb-4 px-10 justify-between">
         <Input
-          className="justify-self-start w-64"
+          className="justify-self-start w-64 text-white border-NavText"
           value={searchby}
           onChange={(e) => setSearchby(e.target.value)}
           placeholder="Search by article title:"
@@ -132,13 +143,33 @@ export default function UserSummaries({ summaries }: UserSummariesProps) {
               <p className="text-justify">{summary.content}</p>
             </CardContent>
             <CardContent className="justify-self-end">
-              <Button
-                variant="destructive"
-                onClick={() => handleDelete(summary.id)}
-              >
-                <Trash2Icon color="white" />{" "}
-                <p className="text-white">Delete from history</p>
-              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger>
+                  <Button variant="destructive">
+                    <Trash2Icon color="white" />{" "}
+                    <p className="text-white">Delete from history</p>
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      Are you absolutely sure?
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action cannot be undone. This will permanently delete
+                      your account and remove your data from our servers.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction asChild>
+                      <Button onClick={() => handleDelete(summary.id)}>
+                        Continue
+                      </Button>
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </CardContent>
           </Card>
         ))}
