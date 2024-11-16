@@ -125,6 +125,15 @@ export default function UserSummaries({ summaries }: UserSummariesProps) {
         </DropdownMenu>
       </div>
       <ScrollArea className="h-96 w-11/12 rounded-md border p-6">
+      {userSummaries.length==0 ?
+
+        searchby=="" ?
+          <h1 className="text-NavText text-4xl font-bold self-center justify-self-center">Nothing here yet</h1> 
+          :
+          <h1 className="text-NavText text-4xl font-bold self-center justify-self-center">No matches</h1> 
+          
+         :
+        <>
         {userSummaries.map((summary) => (
           <Card
             key={summary.id}
@@ -176,7 +185,8 @@ export default function UserSummaries({ summaries }: UserSummariesProps) {
               </AlertDialog>
             </CardContent>
           </Card>
-        ))}
+        ))}</>
+      }
       </ScrollArea>
     </>
   );
