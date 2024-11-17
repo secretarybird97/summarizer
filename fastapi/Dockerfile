@@ -16,4 +16,4 @@ RUN mkdir -p /app/.cache/huggingface
 
 RUN python -c "from transformers import pipeline; pipeline('summarization', model='facebook/bart-large-cnn')"
 
-CMD ["fastapi", "run", "src/app/main.py"]
+CMD ["fastapi", "run", "src/app/main.py", "--port", "80"]
