@@ -12,6 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { register } from "../actions";
 
 import { z } from "zod";
 
@@ -39,24 +40,10 @@ export default function Page() {
 
   async function handleRegister(values: z.infer<typeof SignupFormSchema>) {
     try {
-      const response = await fetch("/api/register", {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values),
-      });
+      await register(values);
 
-      console.log(values);
-      console.log(response);
-
-      if (!response.ok) {
-        throw new Error("Failed to register");
-      }
-
-      console.log("User successfully registered");
-      window.location.href = "/about";
+      console.log("Logged in");
+      window.location.href = "/";
     } catch (error) {
       console.error(error);
     }

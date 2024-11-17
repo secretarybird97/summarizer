@@ -44,6 +44,42 @@ export async function login({ email, password }: LoginProps) {
   return null;
 }
 
+export async function register({ email, password }: LoginProps) {
+  const backendUrl = process.env.BACKEND_URL;
+  const response = await fetch(`${backendUrl}/register`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email, password }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Login failed");
+  }
+
+  const responseCookies = response.headers.get("set-cookie");
+
+  if (responseCookies) {
+    const parsedCookies = responseCookies
+      .split(",")
+      .map((cookie) => cookie.trim());
+
+    const cookieStore = await cookies();
+
+    parsedCookies.forEach((cookie) => {
+      const [cookieName, ...cookieValue] = cookie.split("=");
+      cookieStore.set({
+        name: cookieName,
+        value: cookieValue.join("="),
+      });
+    });
+  }
+
+  return null;
+}
+
 export async function logout() {
   const backendUrl = process.env.BACKEND_URL;
   const cookieStore = await cookies();

@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 env:
-  BACKEND_URL: "http://server:8080"
+  BACKEND_URL: ${{ secrets.BACKEND_URL }}
 
 jobs:
   build:
