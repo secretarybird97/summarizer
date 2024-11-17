@@ -18,4 +18,4 @@ RUN mkdir -p /app/.cache/huggingface && chown -R python:python /app/.cache/huggi
 
 USER python
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["fastapi", "run", "src/app/main.py"]
