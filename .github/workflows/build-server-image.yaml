@@ -4,9 +4,7 @@ on:
   push:
     branches: ["main"]
     paths: ["server/**"]
-  pull_request:
-    branches: ["main"]
-    paths: ["server/**"]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -34,3 +32,20 @@ jobs:
             ghcr.io/${{ github.repository }}/server:latest
           file: ./server/Dockerfile
           context: ./server
+
+  deploy:
+    permissions:
+      contents: none
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: "Production"
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+    steps:
+      - name: Deploy to Azure Web App
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: "dotnet-backend"
+          publish-profile: ${{ secrets.SERVER_PUBLISH_PROFILE }}
+          images: "ghcr.io/${{ github.repository }}/server:${{ github.sha }}"

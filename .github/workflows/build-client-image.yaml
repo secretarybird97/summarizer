@@ -4,9 +4,6 @@ on:
   push:
     branches: ["main"]
     paths: ["client/**"]
-  pull_request:
-    branches: ["main"]
-    paths: ["client/**"]
   workflow_dispatch:
 
 env:
@@ -39,3 +36,20 @@ jobs:
           file: ./client/prod.Dockerfile
           build-args: BACKEND_URL=${{ env.BACKEND_URL }}
           context: ./client
+
+  deploy:
+    permissions:
+      contents: none
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: "Production"
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+    steps:
+      - name: Deploy to Azure Web App
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: "summarizer"
+          publish-profile: ${{ secrets.CLIENT_PUBLISH_PROFILE }}
+          images: "ghcr.io/${{ github.repository }}/client:${{ github.sha }}"
