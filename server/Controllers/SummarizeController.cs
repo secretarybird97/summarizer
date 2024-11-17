@@ -142,6 +142,7 @@ public class SummarizeController(SummarizerDbContext dbContext, SummaryService s
                 }
             }
 
+            await _dbContext.SaveChangesAsync();
             return Ok(new { type = "article", input_text = summary.ArticleText, summary_text = summary.SummaryText });
         }
         catch (Exception ex)

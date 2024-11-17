@@ -2,34 +2,26 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using server.Data;
-using StackExchange.Redis;
 
 namespace server.Services;
 
-public class SummaryService(HttpClient httpClient, SummarizerDbContext dbContext, IConnectionMultiplexer redis, ILogger<SummaryService> logger)
+public class SummaryService(HttpClient httpClient, SummarizerDbContext dbContext, IMemoryCache memoryCache, ILogger<SummaryService> logger)
 {
     private readonly HttpClient _httpClient = httpClient;
     private readonly string _apiUrl = Environment.GetEnvironmentVariable("LLM_API_URL") ?? throw new ArgumentNullException("LLM_API_URL environment variable not set.");
-    private readonly IDatabase _cache = redis.GetDatabase();
+    private readonly IMemoryCache _cache = memoryCache;
     private readonly ILogger<SummaryService> _logger = logger;
     private readonly SummarizerDbContext _dbContext = dbContext;
 
     public async Task<ArticleSummaryResponse> GetArticleSummaryAsync(string url)
     {
         string cacheKey = GenerateCacheKey(url);
-        var cachedSummary = await _cache.StringGetAsync(cacheKey);
 
-        if (!cachedSummary.IsNullOrEmpty)
+        if (_cache.TryGetValue(cacheKey, out ArticleSummaryResponse? cachedSummary) && cachedSummary != null)
         {
-            try
-            {
-                return JsonSerializer.Deserialize<ArticleSummaryResponse>(cachedSummary!)!;
-            }
-            catch (JsonException ex)
-            {
-                _logger.LogError(ex, "Error deserializing cached summary.");
-            }
+            return cachedSummary;
         }
 
         var existingSummary = await _dbContext.Summaries.SingleOrDefaultAsync(s => s.Url == url);
@@ -40,30 +32,23 @@ public class SummaryService(HttpClient httpClient, SummarizerDbContext dbContext
                 ArticleText = existingSummary.Input,
                 SummaryText = existingSummary.Output
             };
-            await _cache.StringSetAsync(cacheKey, JsonSerializer.Serialize(articleSummaryObject), TimeSpan.FromHours(24));
+            _cache.Set(cacheKey, articleSummaryObject, TimeSpan.FromHours(24));
             return articleSummaryObject;
         }
 
         var summary = await SummarizeArticleViaFastApi(url);
-        await _cache.StringSetAsync(cacheKey, JsonSerializer.Serialize(summary), TimeSpan.FromHours(24));
+
+        _cache.Set(cacheKey, summary, TimeSpan.FromHours(24));
         return summary;
     }
 
     public async Task<TextSummaryResponse> GetTextSummaryAsync(string text)
     {
         string cacheKey = GenerateCacheKey(text);
-        var cachedSummary = await _cache.StringGetAsync(cacheKey);
 
-        if (!cachedSummary.IsNullOrEmpty)
+        if (_cache.TryGetValue(cacheKey, out TextSummaryResponse? cachedSummary) && cachedSummary != null)
         {
-            try
-            {
-                return JsonSerializer.Deserialize<TextSummaryResponse>(cachedSummary!)!;
-            }
-            catch (JsonException ex)
-            {
-                _logger.LogError(ex, "Error deserializing cached summary.");
-            }
+            return cachedSummary;
         }
 
         var existingSummary = await _dbContext.Summaries.SingleOrDefaultAsync(s => s.Input == text);
@@ -73,12 +58,12 @@ public class SummaryService(HttpClient httpClient, SummarizerDbContext dbContext
             {
                 SummaryText = existingSummary.Output
             };
-            await _cache.StringSetAsync(cacheKey, JsonSerializer.Serialize(textSummaryObject), TimeSpan.FromHours(24));
+            _cache.Set(cacheKey, textSummaryObject, TimeSpan.FromHours(24));
             return textSummaryObject;
         }
 
         var summary = await SummarizeTextViaFastApi(text);
-        await _cache.StringSetAsync(cacheKey, JsonSerializer.Serialize(summary), TimeSpan.FromHours(24));
+        _cache.Set(cacheKey, summary, TimeSpan.FromHours(24));
         return summary;
     }
 

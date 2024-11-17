@@ -3,16 +3,14 @@ using Microsoft.EntityFrameworkCore;
 using server.Data;
 using server.Models;
 using server.Services;
-using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var postgresConnectionString = Environment.GetEnvironmentVariable("POSTGRES_CONNECTION_STRING");
-var redisConnectionString = Environment.GetEnvironmentVariable("REDIS_CONNECTION_STRING");
 
-if (string.IsNullOrEmpty(postgresConnectionString) || string.IsNullOrEmpty(redisConnectionString))
+if (string.IsNullOrEmpty(postgresConnectionString))
 {
-    throw new InvalidOperationException("POSTGRES_CONNECTION_STRING and REDIS_CONNECTION_STRING environment variables must be set.");
+    throw new InvalidOperationException("POSTGRES_CONNECTION_STRING");
 }
 
 builder.Services.AddDbContext<SummarizerDbContext>(options =>
@@ -20,11 +18,7 @@ builder.Services.AddDbContext<SummarizerDbContext>(options =>
     options.UseNpgsql(postgresConnectionString);
 });
 
-builder.Services.AddStackExchangeRedisCache(options =>
-{
-    options.Configuration = redisConnectionString;
-    options.InstanceName = "Summarizer_";
-});
+builder.Services.AddMemoryCache();
 
 builder.Services.AddIdentityApiEndpoints<User>()
     .AddEntityFrameworkStores<SummarizerDbContext>()
@@ -44,7 +38,6 @@ builder.Services.AddAuthorization();
 builder.Services.AddHttpClient<SummaryService>();
 builder.Services.AddScoped<SummaryService>();
 builder.Services.AddScoped<UserAccessService>();
-builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConnectionString));
 builder.Services.AddControllers();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
