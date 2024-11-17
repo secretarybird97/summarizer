@@ -60,18 +60,6 @@ services:
     networks:
       - summarizer_network
 
-  redis:
-    image: redis:7-alpine
-    restart: always
-    ports:
-      - 6379:6379
-    networks:
-      - summarizer_network
-    profiles:
-      - prod
-      - dev
-      - adminer
-
   adminer:
     image: adminer
     restart: always
