@@ -10,12 +10,10 @@ COPY . .
 
 RUN pip install -r requirements.txt
 
-# Create a non-root user
-RUN addgroup --system --gid 1001 python && \
-    adduser --system --uid 1001 python
+RUN playwright install --with-deps chromium
 
-RUN mkdir -p /app/.cache/huggingface && chown -R python:python /app/.cache/huggingface
+RUN mkdir -p /app/.cache/huggingface
 
-USER python
+RUN python -c "from transformers import pipeline; pipeline('summarization', model='facebook/bart-large-cnn')"
 
 CMD ["fastapi", "run", "src/app/main.py"]
