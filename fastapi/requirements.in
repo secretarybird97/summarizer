@@ -1,6 +1,8 @@
-fastapi
+--index-url https://download.pytorch.org/whl/cpu
 torch
+
+--extra-index-url https://pypi.org/simple
+fastapi[standard]
 transformers
-uvicorn
 beautifulsoup4
-httpx
+playwright

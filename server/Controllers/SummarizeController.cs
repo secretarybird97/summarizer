@@ -1,53 +1,79 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using server.Services;
 using server.Models;
+using Microsoft.EntityFrameworkCore;
+using server.Data;
 
 namespace server.Controllers;
 
 [ApiController]
 [Route("[controller]")]
 [Produces("application/json")]
-public class SummarizeController(SummarizationService summarizationService, ILogger<SummarizeController> logger) : ControllerBase
+public class SummarizeController(SummarizerDbContext dbContext, SummaryService summaryService, UserAccessService userAccessService, ILogger<SummarizeController> logger) : BaseController<SummarizeController>(logger, dbContext)
 {
-    private readonly SummarizationService _summarizationService = summarizationService;
-    private readonly ILogger<SummarizeController> _logger = logger;
+    private readonly SummaryService _summaryService = summaryService;
+    private readonly UserAccessService _userAccessService = userAccessService;
 
     [HttpPost("text", Name = "SummarizeText")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<SuccessDetails>> SummarizeText([FromBody] string text)
+    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
+    public async Task<ActionResult> SummarizeText([FromBody] TextSummaryRequest request)
     {
-        _logger.LogInformation("Summarizing text: {text}", text);
-        if (string.IsNullOrWhiteSpace(text))
+        if (!ModelState.IsValid)
         {
-            _logger.LogWarning("Text is required.");
-            return BadRequest(new ProblemDetails
+            _logger.LogWarning("Invalid model state: {errors}", ModelState);
+            return BadRequest(ModelState);
+        }
+
+        var user = await GetAuthenticatedUserAsync();
+        var guestSummary = user == null ? await HandleGuestRequestAsync(request.IpAddress) : null;
+
+        if (IsRequestLimitExceeded(user, guestSummary, user?.UserName ?? request.IpAddress))
+        {
+            return StatusCode(StatusCodes.Status429TooManyRequests, new ProblemDetails
             {
-                Title = "Text is required.",
-                Status = StatusCodes.Status400BadRequest
+                Title = "Daily request limit exceeded.",
+                Detail = "Users and guests are limited to 5 requests per day.",
+                Status = StatusCodes.Status429TooManyRequests
             });
         }
+
+        _logger.LogInformation($"Summarizing article: {request.Text}");
         try
         {
-            var summary = await _summarizationService.SummarizeText(text);
-            _logger.LogInformation("Summary: {summary}", summary);
-            return Ok(new SuccessDetails
+            var summary = await _summaryService.GetTextSummaryAsync(request.Text);
+            var existingSummary = await _dbContext.Summaries
+                .SingleOrDefaultAsync(s => s.Input == request.Text && s.Output == summary.SummaryText && s.Type == SummaryType.Text);
+
+            Summary summaryEntity;
+            if (existingSummary != null)
             {
-                Data = new DataSchema()
+                summaryEntity = existingSummary;
+            }
+            else
+            {
+                summaryEntity = CreateSummary(request.Text, summary.SummaryText, SummaryType.Text);
+                await _dbContext.Summaries.AddAsync(summaryEntity);
+            }
+
+            if (user != null)
+            {
+                var userSummaryExists = await _dbContext.UserSummaries
+                    .AnyAsync(us => us.UserId == user.Id && us.SummaryId == summaryEntity.Id);
+
+                if (!userSummaryExists)
                 {
-                    Type = "article",
-                    Extensions = new Dictionary<string, object>
-                    {
-                        { "input_text", text },
-                        { "summary_text", summary }
-                    }
+                    await _dbContext.UserSummaries.AddAsync(new UserSummary { User = user, Summary = summaryEntity });
                 }
-            });
+            }
+
+            return Ok(new { type = "text", input_text = request.Text, summary_text = summary.SummaryText });
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error summarizing text: {text}", text);
+            _logger.LogError(ex, $"Error summarizing text: {request.Text}");
             return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
             {
                 Title = "Error summarizing text.",
@@ -55,51 +81,134 @@ public class SummarizeController(SummarizationService summarizationService, ILog
                 Status = StatusCodes.Status500InternalServerError
             });
         }
+        finally
+        {
+            await _dbContext.SaveChangesAsync();
+        }
     }
 
     [HttpPost("article", Name = "SummarizeArticle")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<SuccessDetails>> SummarizeArticle([FromBody] string url)
+    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
+    public async Task<ActionResult> SummarizeArticle([FromBody] ArticleSummaryRequest request)
     {
-        _logger.LogInformation("Summarizing article: {url}", url);
-        if (string.IsNullOrWhiteSpace(url))
+        if (!ModelState.IsValid)
         {
-            _logger.LogWarning("URL is required.");
-            return BadRequest(new ProblemDetails
-            {
-                Title = "URL is required.",
-                Status = StatusCodes.Status400BadRequest
-            });
+            _logger.LogWarning("Invalid model state: {errors}", ModelState);
+            return BadRequest(ModelState);
         }
-        try
+
+        var user = await GetAuthenticatedUserAsync();
+        var guestSummary = user == null ? await HandleGuestRequestAsync(request.IpAddress) : null;
+
+        if (IsRequestLimitExceeded(user, guestSummary, user?.UserName ?? request.IpAddress))
         {
-            var summary = await _summarizationService.SummarizeArticle(url);
-            _logger.LogInformation("Summary: {summary}", summary);
-            return Ok(new SuccessDetails
+            return StatusCode(StatusCodes.Status429TooManyRequests, new ProblemDetails
             {
-                Data = new DataSchema()
-                {
-                    Type = "article",
-                    Extensions = new Dictionary<string, object>
-                    {
-                        { "input_url", url },
-                        { "summary_text", summary }
-                    }
-                }
+                Title = "Daily request limit exceeded.",
+                Detail = "Users and guests are limited to 5 requests per day.",
+                Status = StatusCodes.Status429TooManyRequests
             });
         }
 
+        _logger.LogInformation($"Summarizing article: {request.Url}");
+        try
+        {
+            var summary = await _summaryService.GetArticleSummaryAsync(request.Url);
+            var existingSummary = await _dbContext.Summaries
+                .SingleOrDefaultAsync(s => s.Input == summary.ArticleText && s.Output == summary.SummaryText && s.Type == SummaryType.Article);
+
+            Summary summaryEntity;
+            if (existingSummary != null)
+            {
+                summaryEntity = existingSummary;
+            }
+            else
+            {
+                summaryEntity = CreateSummary(summary.ArticleText, summary.SummaryText, SummaryType.Article, url: request.Url, title: summary.Title);
+                await _dbContext.Summaries.AddAsync(summaryEntity);
+            }
+
+            if (user != null)
+            {
+                var userSummaryExists = await _dbContext.UserSummaries
+                    .AnyAsync(us => us.UserId == user.Id && us.SummaryId == summaryEntity.Id);
+
+                if (!userSummaryExists)
+                {
+                    await _dbContext.UserSummaries.AddAsync(new UserSummary { User = user, Summary = summaryEntity });
+                }
+            }
+
+            return Ok(new { type = "article", input_text = summary.ArticleText, summary_text = summary.SummaryText });
+        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error summarizing article: {url}", url);
+            _logger.LogError(ex, $"Error summarizing article: {request.Url}");
             return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
             {
-                Title = "Error summarizing article.",
+                Title = "Error summarizing text.",
                 Detail = ex.Message,
-                Status = StatusCodes.Status500InternalServerError,
+                Status = StatusCodes.Status500InternalServerError
             });
         }
+        finally
+        {
+            await _dbContext.SaveChangesAsync();
+        }
+    }
+
+    private async Task<GuestUser> HandleGuestRequestAsync(string ipAddress)
+    {
+        var guestSummary = await _dbContext.GuestSummaries.SingleOrDefaultAsync(gs => gs.IpAddress == ipAddress);
+        if (guestSummary == null)
+        {
+            guestSummary = new GuestUser { IpAddress = ipAddress, RequestCount = 1, Date = DateTime.UtcNow };
+            await _dbContext.GuestSummaries.AddAsync(guestSummary);
+        }
+        else
+        {
+            guestSummary.RequestCount++;
+            _dbContext.GuestSummaries.Update(guestSummary);
+        }
+        return guestSummary;
+    }
+
+    private bool IsRequestLimitExceeded(User? user, GuestUser? guestSummary, string identifier)
+    {
+        if (user != null && !_userAccessService.CanSummarize(user))
+        {
+            _logger.LogWarning("User exceeded daily request limit: {identifier}", identifier);
+            return true;
+        }
+        if (guestSummary != null && !_userAccessService.CanSummarize(guestSummary))
+        {
+            _logger.LogWarning("Guest exceeded daily request limit: {identifier}", identifier);
+            return true;
+        }
+        return false;
+    }
+
+    private static Summary CreateSummary(string input, string summaryText, SummaryType type, string url = "", string title = "")
+    {
+        if (type == SummaryType.Article)
+        {
+            return new Summary
+            {
+                Title = title,
+                Url = url,
+                Input = input,
+                Output = summaryText,
+                Type = type
+            };
+        }
+        return new Summary
+        {
+            Input = input,
+            Output = summaryText,
+            Type = type
+        };
     }
 }
