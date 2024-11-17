@@ -102,7 +102,7 @@ public class UserController(ILogger<UserController> logger, SummarizerDbContext 
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult> ChangeSubscriptionTier([FromBody] ChangeSubcriptionRequest request)
+    public async Task<ActionResult> ChangeSubscriptionTier(ChangeSubcriptionRequest request)
     {
         var user = await GetAuthenticatedUserAsync();
         if (user == null)

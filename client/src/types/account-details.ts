@@ -1,6 +1,8 @@
+import { SubscriptionTier } from "./subscription-tier";
+
 export type AccountDetails = {
   createdAt: string;
-  subscriptionTier: number;
+  subscriptionTier: SubscriptionTier;
   dailyRequestCount: number;
   lastRequestAt: string;
   username: string;

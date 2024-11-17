@@ -55,7 +55,7 @@ export default function NavBar({ isAuthenticated }: NavBarProps) {
         <div className="mr-4 hidden md:flex">
           <Link href="/" className="mr-6 flex items-center space-x-2 ml-6">
             <span className="hidden font-bold sm:inline-block font-serif text-NavText">
-              Summarizer
+              Summarizer.
             </span>
           </Link>
           <NavigationMenu>

@@ -1,5 +1,6 @@
 "use server";
 
+import { SubscriptionTier } from "@/types/subscription-tier";
 import { cookies } from "next/headers";
 
 interface LoginProps {
@@ -64,5 +65,34 @@ export async function logout() {
   }
 
   cookieStore.delete(".AspNetCore.Identity.Application");
+  return null;
+}
+
+export async function changeSubscription(subscriptionTier: SubscriptionTier) {
+  const newSubscriptionTier =
+    subscriptionTier === SubscriptionTier.Premium
+      ? SubscriptionTier.Free
+      : SubscriptionTier.Premium;
+  const cookieStore = await cookies();
+  const cookieHeader = cookieStore
+    .getAll()
+    .map((cookie) => `${cookie.name}=${cookie.value}`)
+    .join("; ");
+  const backendUrl = process.env.BACKEND_URL;
+  console.log(JSON.stringify({ newSubscription: newSubscriptionTier }));
+  const response = await fetch(`${backendUrl}/User/subscription`, {
+    method: "PUT",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      Cookie: cookieHeader,
+    },
+    body: JSON.stringify({ newSubscriptionTier }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Change subscription failed");
+  }
+
   return null;
 }

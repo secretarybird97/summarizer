@@ -99,7 +99,7 @@ export default function UserSummaries({ summaries }: UserSummariesProps) {
     <>
       <div className="grid grid-cols-2 w-full mb-4 px-10 justify-between">
         <Input
-          className="justify-self-start w-64 text-white border-NavText"
+          className="justify-self-start w-64 "
           value={searchby}
           onChange={(e) => setSearchby(e.target.value)}
           placeholder="Search by article title:"
@@ -128,11 +128,11 @@ export default function UserSummaries({ summaries }: UserSummariesProps) {
       <ScrollArea className="h-96 w-11/12 rounded-md border p-6">
         {memoizedFilteredSummaries.length === 0 ? (
           searchby === "" ? (
-            <h1 className="text-NavText text-4xl font-bold self-center justify-self-center">
-              Nothing here yet
+            <h1 className="self-center justify-self-center text-secondary-foreground">
+              Nothing to show. Generate some summaries!
             </h1>
           ) : (
-            <h1 className="text-NavText text-4xl font-bold self-center justify-self-center">
+            <h1 className="self-center justify-self-center text-secondary-foreground">
               No matches
             </h1>
           )
@@ -147,16 +147,16 @@ export default function UserSummaries({ summaries }: UserSummariesProps) {
                   <CardTitle className="text-NavText font-bold self-center">
                     {summary.title != "" ? summary.title : summary.id}
                   </CardTitle>
-                  <CardDescription className="text-white self-end">
+                  <CardDescription className="self-end font-light font-mono">
                     Generated on {formatDate(summary.createdAt)}
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="text-white">
+                <CardContent className="">
                   <p className="text-justify">{summary.content}</p>
                 </CardContent>
                 <CardContent className="justify-self-end">
                   <AlertDialog>
-                    <AlertDialogTrigger>
+                    <AlertDialogTrigger asChild>
                       <Button variant="destructive">
                         <Trash2Icon color="white" />{" "}
                         <p className="text-white">Delete from history</p>
@@ -169,8 +169,8 @@ export default function UserSummaries({ summaries }: UserSummariesProps) {
                         </AlertDialogTitle>
                         <AlertDialogDescription>
                           This action cannot be undone. This will permanently
-                          delete your account and remove your data from our
-                          servers.
+                          delete the summary and remove it from your account
+                          history.
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
