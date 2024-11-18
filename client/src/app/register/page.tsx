@@ -70,97 +70,95 @@ export default function Page() {
   }
 
   return (
-    <>
-      <main className="grid items-center justify-items-center pb-20 font-[family-name:var(--font-geist-sans)] mt-16">
-        <Card className="w-3/12 h-min ">
-          <CardHeader>
-            <CardTitle className="text-NavText font-bold">
-              Create an account
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(handleRegister)}
-                className="space-y-8 "
-              >
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-white font-bold">
-                        Email
-                      </FormLabel>
-                      <FormControl className="text-white">
-                        <Input
-                          placeholder="Enter your email address"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-white font-bold">
-                        Password
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          className="text-white"
-                          type="password"
-                          placeholder="Enter your password"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="passwordConfirmation"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-white font-bold">
-                        Confirm your password
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          className="text-white"
-                          type="password"
-                          placeholder="Confirm your password"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button
-                  className="w-full h-full align-bottom font-bold leading-loose bg-intButton hover:bg-rose-500"
-                  type="submit"
-                >
-                  Sign up
-                </Button>
-              </form>
-            </Form>
-            <div className="flex justify-end mt-4 w-full overflow-hidden">
+    <div className="grid items-center justify-items-center mt-16 px-4">
+      <Card className="w-full max-w-lg mx-auto">
+        <CardHeader>
+          <CardTitle className="text-NavText font-bold">
+            Create an account
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(handleRegister)}
+              className="space-y-8 "
+            >
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-white font-bold">
+                      Email
+                    </FormLabel>
+                    <FormControl className="text-white">
+                      <Input
+                        placeholder="Enter your email address"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-white font-bold">
+                      Password
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        className="text-white"
+                        type="password"
+                        placeholder="Enter your password"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="passwordConfirmation"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-white font-bold">
+                      Confirm your password
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        className="text-white"
+                        type="password"
+                        placeholder="Confirm your password"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <Button
-                variant="link"
-                className="text-sm whitespace-nowrap text-NavText"
+                className="w-full h-full align-bottom font-bold leading-loose bg-intButton hover:bg-rose-500"
+                type="submit"
               >
-                <Link href="/login">Already have an account?</Link>
+                Sign up
               </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </main>
-    </>
+            </form>
+          </Form>
+          <div className="flex justify-end mt-4 w-full overflow-hidden">
+            <Button
+              variant="link"
+              className="text-sm whitespace-nowrap text-NavText"
+            >
+              <Link href="/login">Already have an account?</Link>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

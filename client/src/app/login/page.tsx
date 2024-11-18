@@ -51,75 +51,73 @@ export default function Page() {
   }
 
   return (
-    <>
-      <div className="grid items-center justify-items-center pb-20 font-[family-name:var(--font-geist-sans)] mt-16">
-        <Card className="w-3/12 h-min ">
-          <CardHeader>
-            <CardTitle className="text-NavText font-bold">
-              Welcome Back!
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(handleLogin)}
-                className="space-y-8"
-              >
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="font-bold">Email</FormLabel>
-                      <FormControl className="text-white">
-                        <Input
-                          placeholder="Enter your email address"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-white font-bold">
-                        Password
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          className="text-white"
-                          type="password"
-                          placeholder="Enter your password"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button
-                  className="w-full h-full align-bottom font-bold leading-loose bg-intButton hover:bg-rose-400"
-                  type="submit"
-                >
-                  Log in
-                </Button>
-              </form>
-            </Form>
-            <div className="flex justify-end mt-4 w-full overflow-hidden">
+    <div className="grid items-center justify-items-center mt-16 px-4">
+      <Card className="w-full max-w-lg mx-auto">
+        <CardHeader>
+          <CardTitle className="text-NavText font-bold">
+            Welcome Back!
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(handleLogin)}
+              className="space-y-8"
+            >
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="font-bold">Email</FormLabel>
+                    <FormControl className="text-white">
+                      <Input
+                        placeholder="Enter your email address"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-white font-bold">
+                      Password
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        className="text-white"
+                        type="password"
+                        placeholder="Enter your password"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <Button
-                variant="link"
-                className="text-sm whitespace-nowrap text-NavText"
+                className="w-full h-full align-bottom font-bold leading-loose bg-intButton hover:bg-rose-400"
+                type="submit"
               >
-                <a href="/recover">Forgot your password?</a>
+                Log in
               </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    </>
+            </form>
+          </Form>
+          <div className="flex justify-end mt-4 w-full overflow-hidden">
+            <Button
+              variant="link"
+              className="text-sm whitespace-nowrap text-NavText"
+            >
+              <a href="/recover">Forgot your password?</a>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
