@@ -1,3 +1,5 @@
+import asyncio
+from concurrent.futures import ThreadPoolExecutor
 from logging import Logger
 from typing import Dict, Optional
 
@@ -9,13 +11,23 @@ from fastapi import HTTPException
 
 
 class SummaryService:
-    def __init__(self, summarizer: Pipeline, logger: Logger):
+    def __init__(
+        self, summarizer: Pipeline, logger: Logger, executor: ThreadPoolExecutor
+    ):
         self.summarizer = summarizer
         self.logger = logger
+        self.executor = executor
 
     async def text_summary(self, text: str) -> str:
         try:
-            return self.summarizer(text, max_length=100, min_length=5, do_sample=False)[0]["summary_text"]  # type: ignore
+            loop = asyncio.get_event_loop()
+            summary = await loop.run_in_executor(
+                self.executor,
+                lambda: self.summarizer(
+                    text, max_length=100, min_length=5, do_sample=False
+                ),
+            )
+            return summary[0]["summary_text"]  # type: ignore
         except Exception as e:
             self.logger.error(f"Error summarizing text: {e}")
             raise HTTPException(

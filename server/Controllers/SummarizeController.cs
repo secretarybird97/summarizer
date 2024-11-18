@@ -187,6 +187,7 @@ public class SummarizeController(SummarizerDbContext dbContext, SummaryService s
         {
             guestSummary = new GuestUser { IpAddress = ipAddress, RequestCount = 1, Date = DateTime.UtcNow };
             await _dbContext.GuestSummaries.AddAsync(guestSummary);
+            await _dbContext.SaveChangesAsync();
         }
         return guestSummary;
     }

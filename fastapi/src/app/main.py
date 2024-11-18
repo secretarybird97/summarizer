@@ -1,5 +1,5 @@
 import logging
-from typing import Optional
+from concurrent.futures import ThreadPoolExecutor
 
 import torch
 from app.utils.summary_service import SummaryService
@@ -14,7 +14,7 @@ class TextSummaryResponse(BaseModel):
 
 
 class ArticleSummaryResponse(BaseModel):
-    title: Optional[str]
+    title: str
     article_text: str
     summary_text: str
 
@@ -26,8 +26,9 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 summarizer = pipeline(
     "summarization", model="facebook/bart-large-cnn", device=device, framework="pt"
 )
+executor = ThreadPoolExecutor(max_workers=1)
 
-summary_service = SummaryService(summarizer, logger)
+summary_service = SummaryService(summarizer, logger, executor)
 
 app = FastAPI()
 
@@ -46,6 +47,7 @@ async def summarize_article(url: str = Body(...)):
             status_code=404, detail="Failed to fetch the article content"
         )
     title = response.get("title")
+    title = title if title else "Unknown Title"
     article_text = response.get("article_text")
     if not article_text:
         raise HTTPException(status_code=404, detail="Failed to extract article text")
