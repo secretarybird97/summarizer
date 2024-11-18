@@ -9,15 +9,46 @@ import {
 } from "@/components/ui/card";
 import { FileText, Globe, Zap } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Page() {
   const techStack = [
-    { name: "Frontend", logo: "/nextjs-logo.jpg", alt: "NextJS Logo" },
-    { name: "Backend", logo: "/dotnet-logo.png", alt: "Dotnet Core Logo" },
-    { name: "Database", logo: "/postgres-logo.png", alt: "PostgreSQL Logo" },
-    { name: "API", logo: "/fastapi-logo.jpg", alt: "FastAPI Logo" },
-    { name: "Caching", logo: "/redis-logo.png", alt: "Redis Logo" },
-    { name: "AI", logo: "/huggingface-logo.png", alt: "PyTorch Logo" },
+    {
+      name: "Frontend",
+      logo: "/nextjs-logo.jpg",
+      alt: "NextJS Logo",
+      url: "https://nextjs.org/",
+    },
+    {
+      name: "Backend",
+      logo: "/dotnet-logo.png",
+      alt: "Dotnet Core Logo",
+      url: "https://dotnet.microsoft.com/en-us/",
+    },
+    {
+      name: "Database",
+      logo: "/postgres-logo.png",
+      alt: "PostgreSQL Logo",
+      url: "https://www.postgresql.org/",
+    },
+    {
+      name: "API",
+      logo: "/fastapi-logo.jpg",
+      alt: "FastAPI Logo",
+      url: "https://fastapi.tiangolo.com/",
+    },
+    {
+      name: "Caching",
+      logo: "/redis-logo.png",
+      alt: "Redis Logo",
+      url: "https://redis.io/",
+    },
+    {
+      name: "AI",
+      logo: "/huggingface-logo.png",
+      alt: "HuggingFace Logo",
+      url: "https://huggingface.co/",
+    },
   ];
 
   const supportedSites = [
@@ -69,13 +100,15 @@ export default function Page() {
               key={tech.name}
               className="flex flex-col items-center justify-center p-4"
             >
-              <Image
-                src={tech.logo}
-                alt={tech.alt}
-                width={64}
-                height={64}
-                className="mb-2"
-              />
+              <Link href={tech.url} target="_blank">
+                <Image
+                  src={tech.logo}
+                  alt={tech.alt}
+                  width={64}
+                  height={64}
+                  className="mb-2"
+                />
+              </Link>
               <h3 className="font-semibold text-center">{tech.name}</h3>
             </Card>
           ))}

@@ -6,7 +6,7 @@ export default function Footer() {
       <div className="flex justify-between items-center mx-4">
         <p className="font-bold font-serif text-NavText">© 2024 Summarizer.</p>
         <a
-          href="https://github.com/your-repo-link"
+          href="https://github.com/secretarybird97/summarizer"
           target="_blank"
           rel="noopener noreferrer"
           className="text-NavText hover:text-gray-600"

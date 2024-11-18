@@ -16,6 +16,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import Typewriter from "../common/typewriter";
 import { Button } from "../ui/button";
+import { Separator } from "../ui/separator";
 import { Skeleton } from "../ui/skeleton";
 import { Textarea } from "../ui/textarea";
 
@@ -71,11 +72,6 @@ export default function Summarizer() {
       }
 
       if (!response.ok) {
-        toast({
-          title: "Rate limited",
-          description: "Failed to summarize.",
-          variant: "destructive",
-        });
         throw new Error("Server error. Please try again later.");
       }
 
@@ -133,7 +129,7 @@ export default function Summarizer() {
 
       {summary && !loading && (
         <>
-          <hr className="my-8 border-gray-600" />
+          <Separator className="mt-8" />
           <div className="mt-8">
             <h2 className="text-2xl font-bold flex items-center gap-2">
               Summary

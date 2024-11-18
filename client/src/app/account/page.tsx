@@ -8,7 +8,6 @@ import {
 import { AccountDetails } from "@/types/account-details";
 import { UserSummary } from "@/types/user-summary";
 import { redirect } from "next/navigation";
-import { NextResponse } from "next/server";
 
 export default async function Page() {
   const auth = await isAuthenticated();
@@ -18,7 +17,7 @@ export default async function Page() {
 
   const response = await fetchSummaries();
   if (response.status === 401) {
-    return NextResponse.redirect("/login");
+    redirect("/login");
   }
 
   const summaries: UserSummary[] = await response.json();
@@ -26,7 +25,7 @@ export default async function Page() {
   const responseDetails = await fetchAccountDetails();
 
   if (responseDetails.status === 401) {
-    return NextResponse.redirect("/login");
+    redirect("/login");
   }
 
   const userInfo: AccountDetails = await responseDetails.json();
