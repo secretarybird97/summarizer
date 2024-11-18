@@ -11,7 +11,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { toast } from "@/hooks/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { login } from "../actions";
@@ -22,6 +24,7 @@ const formSchema = z.object({
 });
 
 export default function Page() {
+  const router = useRouter();
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -33,18 +36,24 @@ export default function Page() {
   async function handleLogin(values: z.infer<typeof formSchema>) {
     try {
       await login(values);
-
-      console.log("Logged in");
-      window.location.href = "/";
+      toast({
+        title: "Logged in",
+        description: "You have been successfully logged in.",
+      });
+      router.push("/");
     } catch (error) {
-      console.error(error);
+      toast({
+        title: "Failed to login",
+        description: (error as Error).message,
+        variant: "destructive",
+      });
     }
   }
 
   return (
     <>
       <div className="grid items-center justify-items-center pb-20 font-[family-name:var(--font-geist-sans)] mt-16">
-        <Card className="bg-cardsBG w-3/12 h-min border-NavText">
+        <Card className="w-3/12 h-min ">
           <CardHeader>
             <CardTitle className="text-NavText font-bold">
               Welcome Back!
@@ -61,9 +70,7 @@ export default function Page() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-white font-bold">
-                        Email
-                      </FormLabel>
+                      <FormLabel className="font-bold">Email</FormLabel>
                       <FormControl className="text-white">
                         <Input
                           placeholder="Enter your email address"
@@ -103,7 +110,10 @@ export default function Page() {
               </form>
             </Form>
             <div className="flex justify-end mt-4 w-full overflow-hidden">
-              <Button variant="link" className="text-sm whitespace-nowrap">
+              <Button
+                variant="link"
+                className="text-sm whitespace-nowrap text-NavText"
+              >
                 <a href="/recover">Forgot your password?</a>
               </Button>
             </div>

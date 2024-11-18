@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from "react";
 
 interface TypewriterProps {
@@ -20,7 +22,7 @@ const Typewriter = ({ text, delay }: TypewriterProps) => {
     }
   }, [index, delay, text]);
 
-  return <span>{displayText}</span>;
+  return <span>{displayText || "\u00A0"}</span>;
 };
 
 export default Typewriter;
