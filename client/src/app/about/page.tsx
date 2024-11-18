@@ -1,3 +1,4 @@
+import FeatureCard from "@/components/common/feature-card";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -6,6 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { FileText, Globe, Zap } from "lucide-react";
 import Image from "next/image";
 
 export default function Page() {
@@ -36,6 +38,27 @@ export default function Page() {
           summaries from URLs or plain text, using advanced web scraping and
           generative models.
         </p>
+      </section>
+
+      <section className="mb-16">
+        <h2 className="text-3xl font-bold text-center mb-8">Features</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <FeatureCard
+            icon={<Globe className="w-6 h-6" />}
+            title="URL Summarization"
+            description="Summarize any web article by simply pasting the URL"
+          />
+          <FeatureCard
+            icon={<FileText className="w-6 h-6" />}
+            title="Text Summarization"
+            description="Paste any text to get a concise summary in seconds"
+          />
+          <FeatureCard
+            icon={<Zap className="w-6 h-6" />}
+            title="Instant Results"
+            description="Get summaries quickly with our advanced AI technology"
+          />
+        </div>
       </section>
 
       <section className="mb-16">

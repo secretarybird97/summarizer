@@ -7,9 +7,10 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { toast } from "@/hooks/use-toast";
 import { isValidUrl } from "@/lib/utils";
-import { Summary } from "@/types/summary";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -25,7 +26,7 @@ const FormSchema = z.object({
 });
 
 export default function Summarizer() {
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState(false);
   const [summary, setSummary] = useState<string | null>(null);
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -64,64 +65,85 @@ export default function Summarizer() {
       });
 
       if (response.status === 429) {
-        throw new Error("Too many requests, please try again later");
+        throw new Error(
+          "You have reached your daily limit. Please try again later.",
+        );
       }
 
       if (!response.ok) {
-        throw new Error("Failed to summarize");
+        toast({
+          title: "Rate limited",
+          description: "Failed to summarize.",
+          variant: "destructive",
+        });
+        throw new Error("Server error. Please try again later.");
       }
 
-      const result: Summary = await response.json();
+      const result = await response.json();
       setSummary(result.summary_text);
     } catch (error) {
-      const message = (error as Error).message;
-      setSummary(message);
+      toast({
+        title: "Failed to summarize",
+        description: (error as Error).message,
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="grid w-full gap-2"
-      >
-        <FormField
-          control={form.control}
-          name="input"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>What do you want to summarize?</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="Insert URL or text for summary"
-                  className="resize-none"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Button
-          className="w-full h-full align-bottom font-bold leading-loose bg-intButton hover:bg-rose-400"
-          type="submit"
-          disabled={loading}
-        >
-          {loading ? "Summarizing..." : "Generate summary"}
-        </Button>
-      </form>
+    <div className="w-full max-w-2xl mx-auto">
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="input"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>What do you want to summarize?</FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder="Insert any URL or text for summary"
+                    className="resize-none h-32"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button
+            className="w-full font-bold bg-intButton hover:bg-rose-400"
+            type="submit"
+            disabled={loading}
+          >
+            {loading ? "Summarizing..." : "Generate summary"}
+          </Button>
+        </form>
+      </Form>
 
-      {/* Skeleton while loading */}
-      {loading && <Skeleton className="h-24 w-full mt-4" />}
-
-      {/* Display the summary result */}
-      {summary && !loading && (
-        <div className="mt-4">
-          <Typewriter text={summary} delay={50} />
+      {loading && (
+        <div className="mt-8">
+          <Skeleton className="h-4 w-2/3 mb-2" />
+          <Skeleton className="h-4 w-3/4 mb-2" />
+          <Skeleton className="h-4 w-1/2" />
         </div>
       )}
-    </Form>
+
+      {summary && !loading && (
+        <>
+          <hr className="my-8 border-gray-600" />
+          <div className="mt-8">
+            <h2 className="text-2xl font-bold flex items-center gap-2">
+              Summary
+            </h2>
+            <ScrollArea className="h-auto rounded-md p-4">
+              <Typewriter text={summary} delay={15} />
+            </ScrollArea>
+          </div>
+        </>
+      )}
+    </div>
   );
 }

@@ -141,7 +141,7 @@ export default function UserSummaries({ summaries }: UserSummariesProps) {
             {memoizedFilteredSummaries.map((summary) => (
               <Card
                 key={summary.id}
-                className="bg-cardsBG w-full h-min border-transparent my-5"
+                className="bg-[#120c12] grid w-full h-min border-secondary my-5"
               >
                 <CardHeader>
                   <CardTitle className="text-NavText font-bold self-center">

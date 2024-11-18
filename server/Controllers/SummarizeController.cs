@@ -28,7 +28,7 @@ public class SummarizeController(SummarizerDbContext dbContext, SummaryService s
         }
 
         var user = await GetAuthenticatedUserAsync();
-        var guestSummary = user == null ? await HandleGuestRequestAsync(request.IpAddress) : null;
+        var guestSummary = user == null ? await GetGuestUserAsync(request.IpAddress) : null;
 
         if (IsRequestLimitExceeded(user, guestSummary, user?.UserName ?? request.IpAddress))
         {
@@ -68,7 +68,17 @@ public class SummarizeController(SummarizerDbContext dbContext, SummaryService s
                     await _dbContext.UserSummaries.AddAsync(new UserSummary { User = user, Summary = summaryEntity });
                 }
             }
-
+            if (guestSummary != null)
+            {
+                guestSummary.RequestCount++;
+                _dbContext.GuestSummaries.Update(guestSummary);
+            }
+            else if (user != null)
+            {
+                user.DailyRequestCount++;
+                _dbContext.Users.Update(user);
+            }
+            await _dbContext.SaveChangesAsync();
             return Ok(new { type = "text", input_text = request.Text, summary_text = summary.SummaryText });
         }
         catch (Exception ex)
@@ -101,7 +111,7 @@ public class SummarizeController(SummarizerDbContext dbContext, SummaryService s
         }
 
         var user = await GetAuthenticatedUserAsync();
-        var guestSummary = user == null ? await HandleGuestRequestAsync(request.IpAddress) : null;
+        var guestSummary = user == null ? await GetGuestUserAsync(request.IpAddress) : null;
 
         if (IsRequestLimitExceeded(user, guestSummary, user?.UserName ?? request.IpAddress))
         {
@@ -142,6 +152,16 @@ public class SummarizeController(SummarizerDbContext dbContext, SummaryService s
                 }
             }
 
+            if (guestSummary != null)
+            {
+                guestSummary.RequestCount++;
+                _dbContext.GuestSummaries.Update(guestSummary);
+            }
+            else if (user != null)
+            {
+                user.DailyRequestCount++;
+                _dbContext.Users.Update(user);
+            }
             await _dbContext.SaveChangesAsync();
             return Ok(new { type = "article", input_text = summary.ArticleText, summary_text = summary.SummaryText });
         }
@@ -160,19 +180,13 @@ public class SummarizeController(SummarizerDbContext dbContext, SummaryService s
             await _dbContext.SaveChangesAsync();
         }
     }
-
-    private async Task<GuestUser> HandleGuestRequestAsync(string ipAddress)
+    private async Task<GuestUser> GetGuestUserAsync(string ipAddress)
     {
         var guestSummary = await _dbContext.GuestSummaries.SingleOrDefaultAsync(gs => gs.IpAddress == ipAddress);
         if (guestSummary == null)
         {
             guestSummary = new GuestUser { IpAddress = ipAddress, RequestCount = 1, Date = DateTime.UtcNow };
             await _dbContext.GuestSummaries.AddAsync(guestSummary);
-        }
-        else
-        {
-            guestSummary.RequestCount++;
-            _dbContext.GuestSummaries.Update(guestSummary);
         }
         return guestSummary;
     }

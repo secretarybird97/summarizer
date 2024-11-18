@@ -10,7 +10,10 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { toast } from "@/hooks/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { register } from "../actions";
 
@@ -27,32 +30,49 @@ const SignupFormSchema = z.object({
       message: "Contain at least one special character.",
     })
     .trim(),
+  passwordConfirmation: z.string(),
 });
 
 export default function Page() {
+  const router = useRouter();
   const form = useForm({
     resolver: zodResolver(SignupFormSchema),
     defaultValues: {
       email: "",
       password: "",
+      passwordConfirmation: "",
     },
   });
 
   async function handleRegister(values: z.infer<typeof SignupFormSchema>) {
     try {
+      if (values.password !== values.passwordConfirmation) {
+        toast({
+          title: "Failed to register",
+          description: "Passwords do not match.",
+          variant: "destructive",
+        });
+        return;
+      }
       await register(values);
-
-      console.log("Logged in");
-      window.location.href = "/";
+      toast({
+        title: "Registered",
+        description: "You have been successfully registered in.",
+      });
+      router.push("/");
     } catch (error) {
-      console.error(error);
+      toast({
+        title: "Failed to register",
+        description: (error as Error).message,
+        variant: "destructive",
+      });
     }
   }
 
   return (
     <>
       <main className="grid items-center justify-items-center pb-20 font-[family-name:var(--font-geist-sans)] mt-16">
-        <Card className="bg-cardsBG w-3/12 h-min border-NavText">
+        <Card className="w-3/12 h-min ">
           <CardHeader>
             <CardTitle className="text-NavText font-bold">
               Create an account
@@ -104,7 +124,7 @@ export default function Page() {
                 />
                 <FormField
                   control={form.control}
-                  name="password"
+                  name="passwordConfirmation"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-white font-bold">
@@ -131,8 +151,11 @@ export default function Page() {
               </form>
             </Form>
             <div className="flex justify-end mt-4 w-full overflow-hidden">
-              <Button variant="link" className="text-sm whitespace-nowrap">
-                <a href="/login">Already have an account?</a>
+              <Button
+                variant="link"
+                className="text-sm whitespace-nowrap text-NavText"
+              >
+                <Link href="/login">Already have an account?</Link>
               </Button>
             </div>
           </CardContent>
