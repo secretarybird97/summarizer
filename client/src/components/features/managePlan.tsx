@@ -40,7 +40,7 @@ export default function ManagePlan({ userInfo }: { userInfo: AccountDetails }) {
           ? "Basic plan activated"
           : "Premium plan activated",
       });
-    } catch (error) {
+    } catch {
       toast({
         title: "Failed to change plan",
         description: "Please try again later",

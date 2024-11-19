@@ -33,7 +33,7 @@ jobs:
           tags: |
             ghcr.io/${{ github.repository }}/client:${{ github.sha }}
             ghcr.io/${{ github.repository }}/client:latest
-          file: ./client/prod.Dockerfile
+          file: ./client/Dockerfile
           build-args: BACKEND_URL=${{ env.BACKEND_URL }}
           context: ./client
 

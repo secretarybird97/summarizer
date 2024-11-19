@@ -32,12 +32,16 @@ export default async function Page() {
 
   return (
     <div className="flex flex-col">
-      <div className="grid grid-cols-2 items-center justify-items-center pb-20 font-[family-name:var(--font-geist-sans)]">
-        <div className="justify-items-center w-full">
-          <h1 className="font-bold text-4xl mb-10">Account History</h1>
-          <UserSummaries summaries={summaries} />
-        </div>
-        <ManagePlan userInfo={userInfo} />
+      <div className="grid grid-cols-1 md:grid-cols-2 items-center justify-items-center pb-20 font-[family-name:var(--font-geist-sans)]">
+        <section className="mb-8">
+          <div className="justify-items-center w-full">
+            <h1 className="font-bold text-4xl mb-10">Account History</h1>
+            <UserSummaries summaries={summaries} />
+          </div>
+        </section>
+        <section>
+          <ManagePlan userInfo={userInfo} />
+        </section>
       </div>
     </div>
   );
