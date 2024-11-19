@@ -21,7 +21,6 @@ services:
   client:
     build:
       context: ./client
-      dockerfile: prod.Dockerfile
       args:
         - BACKEND_URL=${BACKEND_URL}
     restart: always
@@ -42,7 +41,6 @@ services:
       - summarizer_network
     profiles:
       - prod
-      - dev
     volumes:
       - fastapi_data:/app/.cache
 
@@ -60,6 +58,21 @@ services:
     networks:
       - summarizer_network
 
+  migrations:
+    build:
+      context: ./server
+      dockerfile: migration.Dockerfile
+      args:
+        - POSTGRES_CONNECTION_STRING=${POSTGRES_CONNECTION_STRING}
+    depends_on:
+      - db
+    profiles:
+      - prod
+      - adminer
+    networks:
+      - summarizer_network
+    command: ["dotnet", "ef", "database", "update"] # DON'T RUN THIS COMMAND IN PRODUCTION
+
   adminer:
     image: adminer
     restart: always
@@ -68,43 +81,7 @@ services:
     depends_on:
       - db
     profiles:
-      - dev
       - adminer
-    networks:
-      - summarizer_network
-
-  dev-server:
-    build:
-      context: ./server
-      args:
-        - configuration=Debug
-    ports:
-      - 18080:8080
-    depends_on:
-      - db
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-    volumes:
-      - ~/.vsdbg:/remote_debugger:rw
-    profiles:
-      - dev
-    networks:
-      - summarizer_network
-
-  dev-client:
-    build:
-      context: ./client
-      dockerfile: dev.Dockerfile
-    restart: always
-    ports:
-      - 3000:3000
-    depends_on:
-      - dev-server
-    volumes:
-      - ./client/src:/app/src
-      - ./client/public:/app/public
-    profiles:
-      - dev
     networks:
       - summarizer_network
 
