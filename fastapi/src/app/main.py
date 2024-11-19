@@ -1,4 +1,5 @@
 import logging
+import os
 from concurrent.futures import ThreadPoolExecutor
 
 import torch
@@ -18,6 +19,9 @@ class ArticleSummaryResponse(BaseModel):
     article_text: str
     summary_text: str
 
+
+# * Fix for transformers library issue. Might not be needed in the future
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
