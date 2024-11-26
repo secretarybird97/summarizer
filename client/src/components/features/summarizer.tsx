@@ -1,4 +1,5 @@
 "use client";
+
 import {
   Form,
   FormControl,
@@ -53,11 +54,6 @@ export default function Summarizer() {
       if (!isUrl && data.input.length < MIN_TEXT_LENGTH) {
         throw new Error(
           `Text input should be at least ${MIN_TEXT_LENGTH} characters`,
-        );
-      }
-      if (!isUrl && data.input.length > MAX_TEXT_LENGTH) {
-        throw new Error(
-          `Text input should be at most ${MAX_TEXT_LENGTH} characters`,
         );
       }
       const endpoint = isUrl ? "/api/summarize/article" : "/api/summarize/text";

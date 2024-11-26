@@ -39,8 +39,15 @@ app = FastAPI()
 
 @app.post("/summarize/text")
 async def summarize_text(text: str = Body(...)):
-    summary = await summary_service.text_summary(text)
-    return TextSummaryResponse(summary_text=summary)
+    try:
+        summary_text = await summary_service.text_summary(text)
+        return TextSummaryResponse(summary_text=summary_text)
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail="Internal Server Error"
+        ) from e
 
 
 @app.post("/summarize/article")

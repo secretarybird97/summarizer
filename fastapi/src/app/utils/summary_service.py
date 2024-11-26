@@ -20,6 +20,7 @@ class SummaryService:
 
     async def text_summary(self, text: str) -> str:
         try:
+            print(f"Text length: {len(text)}")
             loop = asyncio.get_event_loop()
             summary = await loop.run_in_executor(
                 self.executor,
@@ -30,12 +31,8 @@ class SummaryService:
             return summary[0]["summary_text"]  # type: ignore
         except Exception as e:
             self.logger.error(f"Error summarizing text: {e}")
-            if(len(text)>3700):
-                raise HTTPException(
-                    status_code=500, detail="Text input should be at most 3700 characters"
-                )
             raise HTTPException(
-                status_code=500, detail="Error during text summarization"
+                status_code=400, detail="Failed to summarize the text"
             )
 
     async def fetch_article_content(

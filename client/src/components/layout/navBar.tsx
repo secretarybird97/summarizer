@@ -57,7 +57,7 @@ export default function NavBar({ isAuthenticated }: NavBarProps) {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b mb-16 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-14 items-center">
+      <div className="justify-between flex h-14 items-center">
         <div className="mr-4 hidden md:flex">
           <Link href="/" className="mr-6 flex items-center space-x-2 ml-6">
             <span className="hidden font-bold sm:inline-block font-serif text-NavText">
@@ -108,7 +108,7 @@ export default function NavBar({ isAuthenticated }: NavBarProps) {
             </nav>
           </SheetContent>
         </Sheet>
-        <div className="flex flex-1 items-center space-x-2 justify-end">
+        <div className="flex flex-1 items-center space-x-2 p-6 justify-end">
           <nav className="flex items-center space-x-1">
             <Button
               variant="ghost"
