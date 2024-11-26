@@ -50,7 +50,7 @@ export default function ManagePlan({ userInfo }: { userInfo: AccountDetails }) {
   };
 
   return (
-    <Card className="bg-[#120c12] h-auto w-auto border-secondary">
+    <Card className="h-auto w-auto">
       <CardHeader>
         <CardTitle className="text-NavText font-bold">
           {isPremium ? "Premium Plan" : "Basic Plan"}
@@ -61,7 +61,7 @@ export default function ManagePlan({ userInfo }: { userInfo: AccountDetails }) {
             : "Free - For casual users"}
         </CardDescription>
       </CardHeader>
-      <CardContent className="text-white">
+      <CardContent>
         <ul className="list-disc list-inside">
           {isPremium ? (
             <>
