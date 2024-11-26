@@ -39,6 +39,8 @@ services:
     restart: always
     networks:
       - summarizer_network
+    ports:
+      - 8000:80
     profiles:
       - prod
     volumes:

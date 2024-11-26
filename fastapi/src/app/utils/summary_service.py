@@ -20,6 +20,7 @@ class SummaryService:
 
     async def text_summary(self, text: str) -> str:
         try:
+            print(f"Text length: {len(text)}")
             loop = asyncio.get_event_loop()
             summary = await loop.run_in_executor(
                 self.executor,
@@ -31,7 +32,7 @@ class SummaryService:
         except Exception as e:
             self.logger.error(f"Error summarizing text: {e}")
             raise HTTPException(
-                status_code=500, detail="Error during text summarization"
+                status_code=400, detail="Failed to summarize the text"
             )
 
     async def fetch_article_content(

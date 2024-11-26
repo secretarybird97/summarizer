@@ -52,12 +52,14 @@ export default function Page() {
   ];
 
   const supportedSites = [
-    "Dailymail",
-    "Reuters",
-    "The Guardian",
     "BBC News",
-    "CNN",
+    "Electrek",
     "The New York Times",
+    "TechCrunch",
+    "The Verge",
+    "IGN",
+    "NPR",
+    "Vogue",
   ];
 
   return (

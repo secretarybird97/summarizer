@@ -88,10 +88,10 @@ export default function Page() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-white font-bold">
+                    <FormLabel className="font-bold">
                       Email
                     </FormLabel>
-                    <FormControl className="text-white">
+                    <FormControl>
                       <Input
                         placeholder="Enter your email address"
                         {...field}
@@ -106,12 +106,12 @@ export default function Page() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-white font-bold">
+                    <FormLabel className="font-bold">
                       Password
                     </FormLabel>
                     <FormControl>
                       <Input
-                        className="text-white"
+                        
                         type="password"
                         placeholder="Enter your password"
                         {...field}
@@ -126,12 +126,12 @@ export default function Page() {
                 name="passwordConfirmation"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-white font-bold">
+                    <FormLabel className="font-bold">
                       Confirm your password
                     </FormLabel>
                     <FormControl>
                       <Input
-                        className="text-white"
+                        
                         type="password"
                         placeholder="Confirm your password"
                         {...field}

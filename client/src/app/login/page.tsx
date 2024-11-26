@@ -70,7 +70,7 @@ export default function Page() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="font-bold">Email</FormLabel>
-                    <FormControl className="text-white">
+                    <FormControl>
                       <Input
                         placeholder="Enter your email address"
                         {...field}
@@ -85,7 +85,7 @@ export default function Page() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-white font-bold">
+                    <FormLabel className="font-bold">
                       Password
                     </FormLabel>
                     <FormControl>

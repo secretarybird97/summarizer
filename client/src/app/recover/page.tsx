@@ -31,7 +31,7 @@ export default function Page() {
   return (
     <>
       <div className="grid items-center justify-items-center pb-20 font-[family-name:var(--font-geist-sans)] mt-16">
-        <Card className="bg-cardsBG w-3/12 h-min border-NavText">
+        <Card className="w-3/12 h-min border-NavText">
           <CardHeader>
             <CardTitle className="text-NavText font-bold">
               Recover your password
@@ -48,10 +48,10 @@ export default function Page() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-white font-bold">
+                      <FormLabel className="font-bold">
                         Email
                       </FormLabel>
-                      <FormControl className="text-white">
+                      <FormControl>
                         <Input
                           placeholder="Enter your email address"
                           {...field}
