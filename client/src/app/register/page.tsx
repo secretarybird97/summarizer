@@ -55,11 +55,11 @@ export default function Page() {
         return;
       }
       await register(values);
+      router.push("/login");
       toast({
         title: "Registered",
         description: "You have been successfully registered in.",
       });
-      router.push("/");
     } catch (error) {
       toast({
         title: "Failed to register",
@@ -88,9 +88,7 @@ export default function Page() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="font-bold">
-                      Email
-                    </FormLabel>
+                    <FormLabel className="font-bold">Email</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="Enter your email address"
@@ -106,12 +104,9 @@ export default function Page() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="font-bold">
-                      Password
-                    </FormLabel>
+                    <FormLabel className="font-bold">Password</FormLabel>
                     <FormControl>
                       <Input
-                        
                         type="password"
                         placeholder="Enter your password"
                         {...field}
@@ -131,7 +126,6 @@ export default function Page() {
                     </FormLabel>
                     <FormControl>
                       <Input
-                        
                         type="password"
                         placeholder="Confirm your password"
                         {...field}

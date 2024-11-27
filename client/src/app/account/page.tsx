@@ -35,7 +35,10 @@ export default async function Page() {
       <div className="grid grid-cols-1 md:grid-cols-2 items-center justify-items-center pb-20 font-[family-name:var(--font-geist-sans)]">
         <section className="mb-8">
           <div className="justify-items-center w-full">
-            <h1 className="font-bold text-4xl mb-10">Account History</h1>
+            <h1 className="font-bold text-4xl mb-2">Account History</h1>
+            <h2 className="mb-10 font-mono text-muted-foreground text-sm">
+              user: {userInfo.username}
+            </h2>
             <UserSummaries summaries={summaries} />
           </div>
         </section>

@@ -22,7 +22,6 @@ import { Skeleton } from "../ui/skeleton";
 import { Textarea } from "../ui/textarea";
 
 const MIN_TEXT_LENGTH = 30;
-const MAX_TEXT_LENGTH = 3700;
 
 const FormSchema = z.object({
   input: z.string().min(1, "Input is required"),
