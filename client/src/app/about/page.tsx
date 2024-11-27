@@ -52,14 +52,38 @@ export default function Page() {
   ];
 
   const supportedSites = [
-    "BBC News",
-    "Electrek",
-    "The New York Times",
-    "TechCrunch",
-    "The Verge",
-    "IGN",
-    "NPR",
-    "Vogue",
+    {
+      name: "BBC News",
+      url: "https://www.bbc.com/news",
+    },
+    {
+      name: "Electrek",
+      url: "https://electrek.co/",
+    },
+    {
+      name: "The New York Times",
+      url: "https://www.nytimes.com/",
+    },
+    {
+      name: "TechCrunch",
+      url: "https://techcrunch.com/",
+    },
+    {
+      name: "The Verge",
+      url: "https://www.theverge.com/",
+    },
+    {
+      name: "IGN",
+      url: "https://www.ign.com/",
+    },
+    {
+      name: "NPR",
+      url: "https://www.npr.org/",
+    },
+    {
+      name: "Vogue",
+      url: "https://www.vogue.com/",
+    },
   ];
 
   return (
@@ -122,11 +146,17 @@ export default function Page() {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {supportedSites.map((site) => (
             <Badge
-              key={site}
+              key={site.name}
               variant="secondary"
               className="text-lg justify-center py-2"
             >
-              {site}
+              <Link
+                href={site.url}
+                target="_blank"
+                className="text-lg justify-center py-2"
+              >
+                {site.name}
+              </Link>
             </Badge>
           ))}
         </div>
